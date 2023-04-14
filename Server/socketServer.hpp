@@ -10,7 +10,7 @@
 #include <cstdio>
 #include "../configuration_file/configuration.hpp"
 
-#define MAX_REQUEST_SIZE 2047
+#define MAX_REQUEST_SIZE 1024
 
 class  clients_info
 {
@@ -26,7 +26,7 @@ class  clients_info
         int     r;
         int            flag_header;
         std::fstream   file;
-        size_t          size;
+        std::streamsize       size;
         std::string     header;
         clients_info();
         clients_info(const clients_info &);

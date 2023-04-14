@@ -33,6 +33,7 @@ SocketServer::~SocketServer()
 std::deque<clients_info>::iterator SocketServer::get_client(int socket_client)
 {
     (void)socket_client;
+    std::cout << "SIze Client : " << clients.size() << "\n";
     std::deque<clients_info>::iterator it_client = clients.begin();
 //    while (it_client != clients.end())
 //    {
@@ -44,9 +45,9 @@ std::deque<clients_info>::iterator SocketServer::get_client(int socket_client)
 //    }
     clients_info add_new;
     add_new.addr_len = sizeof(it_client->address);
-    add_new.flag_header = 0;
     clients.push_front(add_new);
     it_client = clients.begin();
+    it_client->flag_header = 0;
     return (it_client);
 }
 
@@ -57,6 +58,7 @@ void    SocketServer::remove_client(int socket_client)
     {
         if (socket_client == it_client->socket_client_id)
         {
+            std::cout << "Client Num : " << it_client->socket_client_id << " is Diconnected\n";
             close(it_client->socket_client_id);
             clients.erase(it_client);
             return ;
@@ -69,8 +71,7 @@ void    SocketServer::remove_client(int socket_client)
 
 fd_set  SocketServer::wait_clients(int socket_server)
 {
-    struct timeval time;
-    time.tv_usec = 1000;
+    time.tv_usec = 10;
     time.tv_sec = 0;
     fd_set reads;
     FD_ZERO(&reads);
@@ -126,7 +127,7 @@ void    SocketServer::ok_200(std::deque<clients_info>::iterator &client)
 {
     if (client->flag_header == 0)
     {
-        client->file.open("Server/large-file.html", std::ios::in | std::ios::binary | std::ios::ate);
+        client->file.open("Server/movie.mp4", std::ios::in | std::ios::binary | std::ios::ate);
         client->file.seekg(0 , std::ios::end);
         client->size = client->file.tellg();
         std::cout << client->size << std::endl;
@@ -139,7 +140,7 @@ void    SocketServer::ok_200(std::deque<clients_info>::iterator &client)
         }
         client->header = "HTTP/1.1 200 OK\r\n"
                          "Connection: close\r\n"
-                         "Content-Type: text/html\r\n"
+                         "Content-Type: video/mp4\r\n"
                          "Content-Length: " + std::to_string(client->size) + "\r\n\r\n";
 
         send(client->socket_client_id, client->header.c_str(), client->header.size(), 0);
@@ -147,9 +148,10 @@ void    SocketServer::ok_200(std::deque<clients_info>::iterator &client)
         client->flag_header = 1;
     }
 
-    client->file.read(client->response, 2048);
-    send(client->socket_client_id, client->response, strlen(client->response), 0);
-    bzero(client->response, strlen(client->response));
+    client->file.read(client->response, 1024);
+    send(client->socket_client_id, client->response, 1024, 0);
+    bzero(client->response, 1024);
+
 
     if (client->file.eof())
     {
@@ -190,7 +192,7 @@ void    SocketServer::connection(std::deque<server> &srv)
         {
             if (FD_ISSET(it->socket_client_id, &rd))
             {
-//                std::cout << "I'm WAAAAAAAAAAA : " << it->socket_client_id << "  |  " << it->flag_header << std::endl;
+//                std::cout << "I'm WAAAAAAAAAAA : " << it->socket_client_id << "  |  " << it->flag_header << "  |  " << clients.size() << std::endl;
                 ok_200(it);
             }
             it++;
