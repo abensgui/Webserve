@@ -1,0 +1,184 @@
+server
+{
+host 127.0.0.1
+port 8080
+max_client_body_size 1000000
+error_page 400 ./public/htmlErrorPages/error400.html
+error_page 404 ./public/htmlErrorPages/error404.html
+server_name example localhost
+
+location /ayoubayoub
+{
+allow_methods POST GET DELETE
+index index.html index.php aa.txt
+root ./root/others
+upload_pass ayoub
+}
+location /ayoub/ayoub.txt
+{
+allow_methods POST GET DELETE
+index index.html index.php aa.txt
+auto_index on
+upload_pass testing
+root .root/others
+}
+location /
+{
+allow_methods GET POST DELETE
+root Implementations
+auto_index on
+upload_pass uploads
+}
+location /htmlErrorPages
+{
+allow_methods GET POST DELETE
+root /public/htmlErrorPages
+auto_index on
+upload_pass uploads
+}
+location /a/b/
+{
+allow_methods GET DELETE POST
+index aaa.php bbb.php e.php
+upload_pass uuuu
+root ayoubayoub
+}
+}
+server
+{
+host 127.0.0.1
+port 6060
+max_client_body_size 100000000
+error_page 400 ./public/htmlErrorPages/error400.html
+error_page 404 ./public/htmlErrorPages/error404.html
+server_name example localhost
+location /ayoubayoub
+{
+allow_methods POST GET DELETE
+index index.html index.php aa.txt
+root ./root/others
+upload_pass ayoub
+}
+location /ayoub/ayoub.txt
+{
+allow_methods POST GET DELETE
+index index.html index.php aa.txt
+auto_index on
+upload_pass testing
+root .root/others
+}
+location /
+{
+allow_methods GET POST DELETE
+root public
+auto_index off
+upload_pass uploads
+}
+location /htmlErrorPages
+{
+allow_methods GET POST DELETE
+root /public/htmlErrorPages
+auto_index on
+upload_pass uploads
+}
+location /a/b/
+{
+allow_methods GET DELETE POST
+index aaa.php bbb.php e.php
+upload_pass uuuhhhhu
+root ayoubayoub
+return https://chat.openai.com/auth/login
+}
+}
+erver
+{
+host 127.0.0.1
+port 8080
+max_client_body_size 1000000
+error_page 400 ./public/htmlErrorPages/error400.html
+error_page 404 ./public/htmlErrorPages/error404.html
+server_name example localhost
+
+location /ayoubayoub
+{
+allow_methods POST GET DELETE
+index index.html index.php aa.txt
+root ./root/others
+upload_pass ayoub
+}
+location /ayoub/ayoub.txt
+{
+allow_methods POST GET DELETE
+index index.html index.php aa.txt
+auto_index on
+upload_pass testing
+root .root/others
+}
+location /
+{
+allow_methods GET POST DELETE
+root Implementations
+auto_index on
+upload_pass uploads
+}
+location /htmlErrorPages
+{
+allow_methods GET POST DELETE
+root /public/htmlErrorPages
+auto_index on
+upload_pass uploads
+}
+location /a/b/
+{
+allow_methods GET DELETE POST
+index aaa.php bbb.php e.php
+upload_pass uuuu
+root ayoubayoub
+}
+}
+server
+{
+host 127.0.0.1
+port 6060
+max_client_body_size 100000000
+error_page 400 ./public/htmlErrorPages/error400.html
+error_page 404 ./public/htmlErrorPages/error404.html
+server_name example localhost
+location /ayoubayoub
+{
+allow_methods POST GET DELETE
+index index.html index.php aa.txt
+root ./root/others
+upload_pass ayoub
+}
+location /ayoub/ayoub.txt
+{
+allow_methods POST GET DELETE
+index index.html index.php aa.txt
+auto_index on
+upload_pass testing
+root .root/others
+}
+location /
+{
+allow_methods GET POST DELETE
+root public
+auto_index off
+upload_pass uploads
+}
+location /htmlErrorPages
+{
+allow_methods GET POST DELETE
+root /public/htmlErrorPages
+auto_index on
+upload_pass uploads
+}
+location /a/b/
+{
+allow_methods GET DELETE POST
+index aaa.php bbb.php e.php
+upload_pass uuuhhhhu
+root ayoubayoub
+return https://chat.openai.com/auth/login
+}
+}
