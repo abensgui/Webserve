@@ -4,7 +4,7 @@ CC = c++ -std=c++98
 
 FLAGS = -Wall -Wextra -Werror
 
-SRC = configuration_file/configuration.cpp main.cpp Server/socketServer.cpp
+SRC = configuration_file/configuration.cpp main.cpp Server/socketServer.cpp response/GetResponse.cpp
 
 all : $(NAME)
 $(NAME) : $(SRC)

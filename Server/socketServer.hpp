@@ -47,9 +47,6 @@ class SocketServer {
         std::deque<clients_info>::iterator get_client(int socket_client);
         void    remove_client(int socket_client);
         fd_set  wait_clients(int socket_server);
-        void    err_400(int socket_client);
-        void    err_404(int socket_client);
-        void    ok_200(std::deque<clients_info>::iterator &client);
         void    connection(std::deque<server> &srv);
         void    type_content(std::string path_content);
 };

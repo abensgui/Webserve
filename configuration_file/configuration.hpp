@@ -18,7 +18,7 @@ struct location
 struct server
 {
     int socket_id;
-    std::string host, port, server_name;
+    std::string root, host, port, server_name;
     unsigned int mx_cl_bd_size;
     std::map<std::string, std::string> err_pages;
     std::deque<location> locations;
