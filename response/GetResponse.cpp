@@ -44,7 +44,7 @@ void err_403(std::deque<clients_info>::iterator &client)
 //////////////////////////////////////////////////////////////////////////////
 
 
-	    if (client->flag_header == 0)
+	if (client->flag_header == 0)
     {
         client->file.open("error/403.html", std::ios::in | std::ios::binary | std::ios::ate);
         client->file.seekg(0 , std::ios::end);
@@ -67,9 +67,11 @@ void err_403(std::deque<clients_info>::iterator &client)
         client->flag_header = 1;
     }
 
-    client->file.read(client->response, 1024);
-    send(client->socket_client_id, client->response, 1024, 0);
-    bzero(client->response, 1024);
+    if (client->file.read(client->response, 1024))
+    {
+		send(client->socket_client_id, client->response, 1024, 0);
+    	bzero(client->response, 1024);
+	}
 }
 void err_404(std::deque<clients_info>::iterator &client)
 {
@@ -99,9 +101,11 @@ void err_404(std::deque<clients_info>::iterator &client)
         client->flag_header = 1;
     }
 
-    client->file.read(client->response, 1024);
-    send(client->socket_client_id, client->response, 1024, 0);
-    bzero(client->response, 1024);
+    if (client->file.read(client->response, 1024))
+    {
+		send(client->socket_client_id, client->response, 1024, 0);
+    	bzero(client->response, 1024);
+	}
 }
 void ok_200(std::deque<clients_info>::iterator &client, std::string file)
 {
@@ -132,9 +136,11 @@ void ok_200(std::deque<clients_info>::iterator &client, std::string file)
         client->flag_header = 1;
     }
 
-    client->file.read(client->response, 1024);
-    send(client->socket_client_id, client->response, 1024, 0);
-    bzero(client->response, 1024);
+    if (client->file.read(client->response, 1024))
+    {
+		send(client->socket_client_id, client->response, 1024, 0);
+    	bzero(client->response, 1024);
+	}
 }
 
 std::string newpath(std::string path)
@@ -153,7 +159,8 @@ void GetResponse(std::deque<server>::iterator itSrv,std::deque<clients_info>::it
 	int check = 0;
 	int i = 0;
 	// request///
-	std::string path = "/moviemmmm.mp4";
+	std::string path = "/movie111.mp4";
+	////////////////////////
 	itSrv->root = "Server";
 	//////////////
 

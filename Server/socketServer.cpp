@@ -143,7 +143,9 @@ void SocketServer::connection(std::deque<server> &srv)
         {
             if (FD_ISSET(it->socket_client_id, &rd))
             {
-                std::cout << "------------------\n";
+                // recv(it->socket_client_id, it->request, 1024, 0);
+                // std::cout << "Req : " << it->request << std::endl;
+                // std::cout << "------------------\n";
                 GetResponse(it_response, it);
                 if (it->file.eof())
                 {
