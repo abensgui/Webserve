@@ -35,7 +35,6 @@ SocketServer::~SocketServer()
 std::deque<clients_info>::iterator SocketServer::get_client(int socket_client)
 {
     (void)socket_client;
-    std::cout << "SIze Client : " << clients.size() << "\n";
     std::deque<clients_info>::iterator it_client = clients.begin();
     //    while (it_client != clients.end())
     //    {
@@ -83,6 +82,7 @@ fd_set SocketServer::wait_clients(int socket_server)
     while (it_client != clients.end())
     {
         FD_SET(it_client->socket_client_id, &reads);
+
         if (it_client->socket_client_id > max_socket)
         {
             max_socket = it_client->socket_client_id;
@@ -97,25 +97,42 @@ fd_set SocketServer::wait_clients(int socket_server)
     return (reads);
 }
 
-void SocketServer::type_content(std::string path_content)
+void SocketServer::parse_request(std::deque<clients_info>::iterator &it_client)
 {
-    int pos = path_content.find(".");
-    if (path_content[pos + 1] == '.')
+    if (recv(it_client->socket_client_id, it_client->request, strlen(it_client->request), 0) > 0)
     {
-        path_content = path_content.substr(pos + 2);
-        pos = path_content.find(".");
-    }
-    std::string extension = path_content.substr(pos);
-    std::cout << "HHIIIIHHOOOO : " << extension << std::endl;
+         if (it_client->flag_header == 0)
+         {
+             int pos;
+             std::string key, value, walo;
+             std::string req = it_client->request;
+             std::stringstream strm(req);
+             getline(strm, it_client->method, ' ');
+             getline(strm, it_client->path, ' ');
+             getline(strm, it_client->protocol, '\n');
+             getline(strm, walo, ' ');
+             getline(strm, walo, '\n');
+             pos = walo.find(":");
+             if (pos == -1)
+                 it_client->host = walo;
+             else
+             {
+                 it_client->host = walo.substr(0, pos);
+                 it_client->port = walo.substr(pos + 1);
+             }
+             while (getline(strm, key, ':') && getline(strm, value, '\n'))
+                 it_client->map_request[key] = value;
+//         std::cout << "Req : " << it_client->host << std::endl;
+//         std::cout << "Req : " << it_client->port << std::endl;
+         }
+     }
 }
-
 
 void SocketServer::connection(std::deque<server> &srv)
 {
     std::deque<server>::iterator it_srv, it_response;
     std::deque<clients_info>::iterator it;
     fd_set rd;
-
     while (1)
     {
         it = clients.begin();
@@ -132,6 +149,7 @@ void SocketServer::connection(std::deque<server> &srv)
                     std::cerr << "Error in Connection\n";
                     return;
                 }
+                parse_request(it);
                 std::cout << "Client Num : " << it->socket_client_id << " is Connected with Server : [" << it_srv->host << ":" << it_srv->port << "]\n";
                 it_response = it_srv;
                 break;
@@ -143,9 +161,6 @@ void SocketServer::connection(std::deque<server> &srv)
         {
             if (FD_ISSET(it->socket_client_id, &rd))
             {
-                // recv(it->socket_client_id, it->request, 1024, 0);
-                // std::cout << "Req : " << it->request << std::endl;
-                // std::cout << "------------------\n";
                 GetResponse(it_response, it);
                 if (it->file.eof())
                 {

@@ -67,11 +67,9 @@ void err_403(std::deque<clients_info>::iterator &client)
         client->flag_header = 1;
     }
 
-    if (client->file.read(client->response, 1024))
-    {
-		send(client->socket_client_id, client->response, 1024, 0);
-    	bzero(client->response, 1024);
-	}
+    client->file.read(client->response, 1024);
+    send(client->socket_client_id, client->response, 1024, 0);
+    bzero(client->response, 1024);
 }
 void err_404(std::deque<clients_info>::iterator &client)
 {
@@ -101,46 +99,41 @@ void err_404(std::deque<clients_info>::iterator &client)
         client->flag_header = 1;
     }
 
-    if (client->file.read(client->response, 1024))
-    {
-		send(client->socket_client_id, client->response, 1024, 0);
-    	bzero(client->response, 1024);
-	}
+    client->file.read(client->response, 1024);
+    send(client->socket_client_id, client->response, 1024, 0);
+    bzero(client->response, 1024);
 }
 void ok_200(std::deque<clients_info>::iterator &client, std::string file)
 {
 //////////////////////////////////////////////////////////////////////////////
 
-
-	    if (client->flag_header == 0)
+    if (client->flag_header == 0)
     {
+
         client->file.open(file, std::ios::in | std::ios::binary | std::ios::ate);
         client->file.seekg(0 , std::ios::end);
         client->size = client->file.tellg();
-        std::cout << client->size << std::endl;
         client->file.seekg(0, std::ios::beg);
 
         if (!client->file.is_open())
         {
-			std::cout << "----------403--------\n";
+            std::cout << "----------403--------\n";
             err_403(client);
             return;
         }
         client->header = "HTTP/1.1 200 OK\r\n"
                          "Connection: close\r\n"
-                         "Content-Type: image/jpeg\r\n"
+                         "Content-Type: video/mp4\r\n"
                          "Content-Length: " + std::to_string(client->size) + "\r\n\r\n";
 
         send(client->socket_client_id, client->header.c_str(), client->header.size(), 0);
-        std::cout << client->header << std::endl;
         client->flag_header = 1;
     }
 
-    if (client->file.read(client->response, 1024))
-    {
-		send(client->socket_client_id, client->response, 1024, 0);
-    	bzero(client->response, 1024);
-	}
+    client->file.read(client->response, 1024);
+    send(client->socket_client_id, client->response, 1024, 0);
+    bzero(client->response, 1024);
+
 }
 
 std::string newpath(std::string path)
@@ -159,7 +152,7 @@ void GetResponse(std::deque<server>::iterator itSrv,std::deque<clients_info>::it
 	int check = 0;
 	int i = 0;
 	// request///
-	std::string path = "/movie111.mp4";
+	std::string path = "/movie.mp4";
 	////////////////////////
 	itSrv->root = "Server";
 	//////////////
