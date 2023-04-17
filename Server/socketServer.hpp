@@ -23,7 +23,7 @@ class  clients_info
         char            response[MAX_REQUEST_SIZE + 1];
         int             flag_header;
         std::fstream    file;
-        std::streamsize     size;
+        std::streamsize size;
         std::string     header;
         std::string     method, path, protocol, host, port;
         std::map<std::string, std::string > map_request;
@@ -35,6 +35,7 @@ class  clients_info
 
 class SocketServer {
     public :
+        fd_set reads, writer;
         struct timeval time;
         SocketServer();
         SocketServer(SocketServer const &cpy);

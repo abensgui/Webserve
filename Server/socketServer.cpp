@@ -76,12 +76,25 @@ fd_set SocketServer::wait_clients(int socket_server)
     time.tv_sec = 0;
     fd_set reads;
     FD_ZERO(&reads);
+    FD_ZERO(&writer);
     FD_SET(socket_server, &reads);
+    FD_SET(socket_server, &writer);
     int max_socket = socket_server;
     std::deque<clients_info>::iterator it_client = clients.begin();
     while (it_client != clients.end())
     {
         FD_SET(it_client->socket_client_id, &reads);
+
+        if (it_client->socket_client_id > max_socket)
+        {
+            max_socket = it_client->socket_client_id;
+        }
+        it_client++;
+    }
+    it_client = clients.begin();
+    while (it_client != clients.end())
+    {
+        FD_SET(it_client->socket_client_id, &writer);
 
         if (it_client->socket_client_id > max_socket)
         {
@@ -99,7 +112,7 @@ fd_set SocketServer::wait_clients(int socket_server)
 
 void SocketServer::parse_request(std::deque<clients_info>::iterator &it_client)
 {
-    if (recv(it_client->socket_client_id, it_client->request, strlen(it_client->request), 0) > 0)
+    if (recv(it_client->socket_client_id, it_client->request, 1024, 0) > 0)
     {
          if (it_client->flag_header == 0)
          {
@@ -150,6 +163,7 @@ void SocketServer::connection(std::deque<server> &srv)
                     return;
                 }
                 parse_request(it);
+                std::cout << "PATH : " << it->path << std::endl;
                 std::cout << "Client Num : " << it->socket_client_id << " is Connected with Server : [" << it_srv->host << ":" << it_srv->port << "]\n";
                 it_response = it_srv;
                 break;
@@ -159,7 +173,7 @@ void SocketServer::connection(std::deque<server> &srv)
         it = clients.begin();
         while (it != clients.end())
         {
-            if (FD_ISSET(it->socket_client_id, &rd))
+            if (FD_ISSET(it->socket_client_id, &writer))
             {
                 GetResponse(it_response, it);
                 if (it->file.eof())

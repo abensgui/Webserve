@@ -1,7 +1,7 @@
 #include "GetResponse.hpp"
 #include <fstream>
 #include <string>
-const char *get_content_type(const char *path)
+std::string get_content_type(const char *path)
 {
 	const char *last_dot = strrchr(path, '.');
 	if (last_dot)
@@ -49,7 +49,7 @@ void err_403(std::deque<clients_info>::iterator &client)
         client->file.open("error/403.html", std::ios::in | std::ios::binary | std::ios::ate);
         client->file.seekg(0 , std::ios::end);
         client->size = client->file.tellg();
-        std::cout << client->size << std::endl;
+//        std::cout << client->size << std::endl;
         client->file.seekg(0, std::ios::beg);
 
         if (!client->file.is_open())
@@ -63,7 +63,7 @@ void err_403(std::deque<clients_info>::iterator &client)
                          "Content-Length: " + std::to_string(client->size) + "\r\n\r\n";
 
         send(client->socket_client_id, client->header.c_str(), client->header.size(), 0);
-        std::cout << client->header << std::endl;
+//        std::cout << client->header << std::endl;
         client->flag_header = 1;
     }
 
@@ -76,12 +76,12 @@ void err_404(std::deque<clients_info>::iterator &client)
 //////////////////////////////////////////////////////////////////////////////
 
 
-	    if (client->flag_header == 0)
+    if (client->flag_header == 0)
     {
         client->file.open("error/404.html", std::ios::in | std::ios::binary | std::ios::ate);
         client->file.seekg(0 , std::ios::end);
         client->size = client->file.tellg();
-        std::cout << client->size << std::endl;
+//        std::cout << client->size << std::endl;
         client->file.seekg(0, std::ios::beg);
 
         if (!client->file.is_open())
@@ -95,7 +95,7 @@ void err_404(std::deque<clients_info>::iterator &client)
                          "Content-Length: " + std::to_string(client->size) + "\r\n\r\n";
 
         send(client->socket_client_id, client->header.c_str(), client->header.size(), 0);
-        std::cout << client->header << std::endl;
+//        std::cout << client->header << std::endl;
         client->flag_header = 1;
     }
 
@@ -103,7 +103,8 @@ void err_404(std::deque<clients_info>::iterator &client)
     send(client->socket_client_id, client->response, 1024, 0);
     bzero(client->response, 1024);
 }
-void ok_200(std::deque<clients_info>::iterator &client, std::string file)
+
+void ok_200(std::deque<clients_info>::iterator &client, std::string file, std::string path)
 {
 //////////////////////////////////////////////////////////////////////////////
 
@@ -123,7 +124,7 @@ void ok_200(std::deque<clients_info>::iterator &client, std::string file)
         }
         client->header = "HTTP/1.1 200 OK\r\n"
                          "Connection: close\r\n"
-                         "Content-Type: video/mp4\r\n"
+                         "Content-Type: " + get_content_type(path.c_str()) + "\r\n"
                          "Content-Length: " + std::to_string(client->size) + "\r\n\r\n";
 
         send(client->socket_client_id, client->header.c_str(), client->header.size(), 0);
@@ -152,7 +153,8 @@ void GetResponse(std::deque<server>::iterator itSrv,std::deque<clients_info>::it
 	int check = 0;
 	int i = 0;
 	// request///
-	std::string path = "/movie.mp4";
+	std::string path = client->path;
+    std::cout << "--------- path   --------"<< path << std::endl;
 	////////////////////////
 	itSrv->root = "Server";
 	//////////////
@@ -182,7 +184,7 @@ void GetResponse(std::deque<server>::iterator itSrv,std::deque<clients_info>::it
 			if (file1.good())
 			{
 				std::cout << "exist\n";
-				ok_200(client, file);
+				ok_200(client, file, path);
 			}
 			else
 			{
@@ -205,7 +207,7 @@ void GetResponse(std::deque<server>::iterator itSrv,std::deque<clients_info>::it
 		if (file1.good())
 		{
 			std::cout << "exist\n";
-			ok_200(client, file);
+			ok_200(client, file, path);
 		}
 		else
 		{
