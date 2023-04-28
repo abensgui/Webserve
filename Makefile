@@ -2,7 +2,7 @@ NAME = webserv
 
 CC = c++ -std=c++98
 
-FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror -fsanitize=address -g3
 
 SRC = configuration_file/configuration.cpp main.cpp Server/socketServer.cpp response/GetResponse.cpp
 

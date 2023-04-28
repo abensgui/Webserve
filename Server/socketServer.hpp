@@ -31,6 +31,10 @@ class  clients_info
         clients_info(const clients_info &);
         clients_info& operator=(const clients_info& obj);
         ~clients_info();
+        size_t      content_len;
+        size_t      len_rd;
+        int         flag_res;
+        int         flag_req;
 };
 
 class SocketServer {

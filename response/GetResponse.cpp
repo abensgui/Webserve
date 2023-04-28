@@ -154,7 +154,7 @@ void GetResponse(std::deque<server>::iterator itSrv,std::deque<clients_info>::it
 	int i = 0;
 	// request///
 	std::string path = client->path;
-    std::cout << "--------- path   --------"<< path << std::endl;
+//    std::cout << "--------- path   --------"<< path << std::endl;
 	////////////////////////
 	itSrv->root = "Server";
 	//////////////
@@ -179,11 +179,11 @@ void GetResponse(std::deque<server>::iterator itSrv,std::deque<clients_info>::it
 				err_404(client);
 			}
 			file = itLoc->root + path;
-			std::cout << file << std::endl;
+//			std::cout << file << std::endl;
 			std::ifstream file1(file);
 			if (file1.good())
 			{
-				std::cout << "exist\n";
+//				std::cout << "exist\n";
 				ok_200(client, file, path);
 			}
 			else
@@ -201,12 +201,12 @@ void GetResponse(std::deque<server>::iterator itSrv,std::deque<clients_info>::it
 	}
 	if (check == 0)
 	{
-		std::cout << "=========no location===============\n";
+//		std::cout << "=========no location===============\n";
 		file = itSrv->root + path;
 		std::ifstream file1(file);
 		if (file1.good())
 		{
-			std::cout << "exist\n";
+//			std::cout << "exist\n";
 			ok_200(client, file, path);
 		}
 		else
