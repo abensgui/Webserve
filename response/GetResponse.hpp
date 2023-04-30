@@ -8,6 +8,6 @@
 
 
 
-void GetResponse(std::deque<server>::iterator itSrv, std::deque<clients_info>::iterator &client);
+void GetResponse(std::deque<server> itSrv, std::deque<clients_info> &client, int it_client);
 
 #endif /* ***************************************************** GETRESPONSE_H */
