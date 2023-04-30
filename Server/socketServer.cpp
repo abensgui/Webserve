@@ -203,8 +203,6 @@ void SocketServer::connection(std::deque<server> &srv)
         it_client = 0;
         while (it_client < clients.size())
         {
-//            std::cout << "A : index  : " << it_client << " | NUM : " << clients[it_client].socket_client_id << std::endl;
-
             if (FD_ISSET(clients[it_client].socket_client_id, &writer))
             {
                 parse_request(it_client);
@@ -213,9 +211,6 @@ void SocketServer::connection(std::deque<server> &srv)
                     GetResponse(srv, clients, it_client);
                 if (clients[it_client].file.gcount() == 0 && clients[it_client].flag_res == 1 && clients[it_client].file.eof())
                 {
-                    int i = 0;
-                    i++;
-//                    std::cout << "here " << i << "\n";
                     clients[it_client].file.close();
                     it_client = remove_client(clients[it_client].socket_client_id);
                     continue;
@@ -228,11 +223,9 @@ void SocketServer::connection(std::deque<server> &srv)
 
 void SocketServer::run_server(std::deque<server> &servers)
 {
-//    std::deque<server>::iterator it = servers.begin();
-    int i = 0;
-    int size = servers.size();
+    size_t i = 0;
     // 1 - creat socket for each server
-    while (i < size)
+    while (i < servers.size())
     {
         servers[i].socket_id = socket(AF_INET, SOCK_STREAM, 0);
         if (servers[i].socket_id < 0)
@@ -259,7 +252,6 @@ void SocketServer::run_server(std::deque<server> &servers)
             exit(1);
         }
         std::cout << "Listening...\n";
-        //            type_content("../Server/index.html");
         i++;
     }
     connection(servers);

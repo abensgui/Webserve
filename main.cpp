@@ -1,77 +1,8 @@
 #include "configuration_file/configuration.hpp"
 #include "Server/socketServer.hpp"
 
-//int get_cli(SocketServer &skt)
-//{
-//    int i = 0;
-//    clients_info client1;
-////        client1.socket_client_id = i;
-//    skt.clients.push_back(client1);
-//    i = skt.clients.size() - 1;
-//    skt.clients[i].socket_client_id = i;
-//    return (i);
-//}
-//
-//std::vector<clients_info>::iterator rmv_cli(int index, SocketServer &skt)
-//{
-////    size_t it_client = 0;
-//    std::vector<clients_info>::iterator it_client = skt.clients.begin();
-//    while (it_client != skt.clients.end())
-//    {
-//        if (index == it_client->socket_client_id)
-//        {
-//            skt.clients.erase(it_client);
-//            std::cout << "HEREEEE" << it_client->socket_client_id << "\n";
-//            return (it_client);
-//        }
-//        it_client++;
-//    }
-//    return it_client;
-//}
-
 int main(int ac , char **av)
 {
-//    if (ac != 2)
-//        exit (1);
-//
-////    (void)av;
-//    confi cfg;
-//    SocketServer skt;
-//    cfg.setup_configuration(av[1]);
-//
-//    for (int i = 0; i < 10; i++)
-//    {
-//        clients_info name;
-//        name.socket_client_id = i;
-//        skt.clients.push_back(name);
-//    }
-////
-//    std::cout << "===============BEFORE==============\n";
-//    for (size_t i = 0; i < skt.clients.size(); i++)
-//    {
-//        std::cout << " " << skt.clients[i].socket_client_id;
-//    }
-//    std::cout << "\n==============AFTER=================\n";
-//    std::vector<clients_info>::iterator  it = skt.clients.begin();
-//
-//    while (it != skt.clients.end())
-//    {
-//        if (it->socket_client_id == 2)
-//        {
-//            it = skt.clients.erase(it);
-//            break;
-//        }
-//        it++;
-//
-//    }
-//    for (size_t i = 0; i < skt.clients.size(); i++)
-//    {
-//        std::cout << " " << skt.clients.at(i).socket_client_id;
-//    }
-//    std::cout << "\n";
-//}
-    //========================================================================
-
     signal(SIGPIPE, SIG_IGN);
     if (ac != 2)
         exit (1);
