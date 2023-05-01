@@ -54,6 +54,7 @@ int     confi::setup_configuration(std::string file)
                             exit(1);
                         }
                         lc.path_location = value;
+                        lc.auto_index = "on";
                         while (getline(congi_file, line))
                         {
                             std::string key_local, value_local;

@@ -3,9 +3,9 @@
 
 int main(int ac , char **av)
 {
-    signal(SIGPIPE, SIG_IGN);
     if (ac != 2)
         exit (1);
+    signal(SIGPIPE, SIG_IGN);
     confi cfg;
     SocketServer skt;
     cfg.setup_configuration(av[1]);

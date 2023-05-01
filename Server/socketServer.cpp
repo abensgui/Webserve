@@ -89,8 +89,6 @@ int  SocketServer::remove_client(int socket_client)
 
 void SocketServer::wait_clients(std::deque<server> &srv)
 {
-    time.tv_sec = 0;
-    time.tv_usec = 100;
     FD_ZERO(&reads);
     FD_ZERO(&writer);
     size_t it_srv = 0;
@@ -126,7 +124,7 @@ void SocketServer::wait_clients(std::deque<server> &srv)
         }
         it_client++;
     }
-    if (select(max_socket + 1, &reads, &writer, 0, &time) < 0)
+    if (select(max_socket + 1, &reads, &writer, 0, 0) < 0)
         std::cout << "Select : Failed\n";
 }
 
@@ -208,7 +206,7 @@ void SocketServer::connection(std::deque<server> &srv)
                 parse_request(it_client);
 
                 if (clients[it_client].flag_res == 1)
-                    GetResponse(srv, clients, it_client);
+                    GetResponse(srv, clients[it_client]);
                 if (clients[it_client].file.gcount() == 0 && clients[it_client].flag_res == 1 && clients[it_client].file.eof())
                 {
                     clients[it_client].file.close();

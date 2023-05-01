@@ -37,6 +37,7 @@ class  clients_info
         size_t      len_rd;
         int         flag_res;
         int         flag_req;
+        bool        flagRed;
 };
 
 class SocketServer {
