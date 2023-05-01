@@ -16,8 +16,7 @@ clients_info &clients_info::operator=(const clients_info &obj)
 //    ba9i (request, obj.request);
 //    ba9i (response, obj.response);
     flag_header = obj.flag_header;
-    path_file = obj.path_file;
-    file.open(path_file, std::ios::in | std::ios::binary | std::ios::out);
+    file.open(obj.path_file, std::ios::in | std::ios::binary | std::ios::out);
     file << obj.file.rdbuf();
     size = obj.size;
     header = obj.header;
@@ -207,10 +206,11 @@ void SocketServer::connection(std::deque<server> &srv)
 
                 if (clients[it_client].flag_res == 1)
                     GetResponse(srv, clients[it_client]);
-                if (clients[it_client].file.gcount() == 0 && clients[it_client].flag_res == 1 && clients[it_client].file.eof())
+                if ((clients[it_client].file.gcount() == 0 && clients[it_client].flag_res == 1 && clients[it_client].file.eof()) || clients[it_client].flagRed == true)
                 {
                     clients[it_client].file.close();
                     it_client = remove_client(clients[it_client].socket_client_id);
+                    clients[it_client].flagRed = false;
                     continue;
                 }
             }

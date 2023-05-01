@@ -42,6 +42,7 @@ std::string get_content_type(const char *path)
 void err_403(clients_info &client)
 {
 	//////////////////////////////////////////////////////////////////////////////
+	// std::cout << "lllllllllllllllllllllllllll\n";
 
 	if (client.flag_header == 0)
 	{
@@ -56,7 +57,7 @@ void err_403(clients_info &client)
 			err_403(client);
 			return;
 		}
-		client.header = "HTTP/1.1 200  Forbidden\r\n"
+		client.header = "HTTP/1.1 403 Forbidden\r\n"
 						"Connection: close\r\n"
 						"Content-Type: text/html\r\n"
 						"Content-Length: " +
@@ -71,6 +72,41 @@ void err_403(clients_info &client)
 	send(client.socket_client_id, client.response, 1024, 0);
 	bzero(client.response, 1024);
 }
+
+void err_405(clients_info &client)
+{
+	//////////////////////////////////////////////////////////////////////////////
+
+	if (client.flag_header == 0)
+	{
+		client.file.open("error/405.html", std::ios::in | std::ios::binary | std::ios::ate);
+		client.file.seekg(0, std::ios::end);
+		client.size = client.file.tellg();
+		//        std::cout << client.size << std::endl;
+		client.file.seekg(0, std::ios::beg);
+
+		if (!client.file.is_open())
+		{
+			std::cout << "here\n";
+			err_403(client);
+			return;
+		}
+		client.header = "HTTP/1.1 405 Method Not Allowed\r\n"
+						"Connection: close\r\n"
+						"Content-Type: text/html\r\n"
+						"Content-Length: " +
+						std::to_string(client.size) + "\r\n\r\n";
+
+		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
+		//        std::cout << client.header << std::endl;
+		client.flag_header = 1;
+	}
+
+	client.file.read(client.response, 1024);
+	send(client.socket_client_id, client.response, 1024, 0);
+	bzero(client.response, 1024);
+}
+
 void err_404(clients_info &client)
 {
 	//////////////////////////////////////////////////////////////////////////////
@@ -88,7 +124,7 @@ void err_404(clients_info &client)
 			err_403(client);
 			return;
 		}
-		client.header = "HTTP/1.1 200 Not Found\r\n"
+		client.header = "HTTP/1.1 404 Not Found\r\n"
 						"Connection: close\r\n"
 						"Content-Type: text/html\r\n"
 						"Content-Length: " +
@@ -110,7 +146,7 @@ void ok_200(clients_info &client, std::string file)
 
 	if (client.flag_header == 0)
 	{
-
+		client.path_file = file;
 		client.file.open(file, std::ios::in | std::ios::binary | std::ios::ate);
 		client.file.seekg(0, std::ios::end);
 		client.size = client.file.tellg();
@@ -168,8 +204,7 @@ void listDir(clients_info &client)
 					std::to_string(s.size()) +
 					"\r\n\r\n";
 	send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
-	send(client.socket_client_id, output.str().c_str(), 108, 0);
-	client.flagRed = true;
+	send(client.socket_client_id, output.str().c_str(), 1028, 0);
 }
 
 std::string newpath(std::string path)
@@ -217,10 +252,11 @@ std::deque<location>::iterator location_match(std::deque<location> &loc, std::st
 
 void ft_redi(std::string redi, clients_info &client)
 {
-	std::cout << "here" << std::endl;
-	(void)redi;
+	std::cout << "==========here" << std::endl;
 	client.header = "HTTP/1.1 301 Moved Permanently\r\n"
-					"Location: http://www.example.org\r\n";
+					"Location: "+
+					redi
+					+ "\r\n\n\r";
 	send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
 }
 
@@ -236,7 +272,7 @@ bool methodAllow(std::string met, std::deque<std::string> metA)
 	std::cout << "-------------seg\n";
 	return (0);
 }
-int is_fileOrDir(std::string path)
+bool is_fileOrDir(std::string path)
 {
 	std::cout << "--------------on----------  " << std::endl;
 	path = path.substr(1, path.length() - 1);
@@ -248,21 +284,6 @@ int is_fileOrDir(std::string path)
 			std::cout << path << " is a directory" << std::endl;
 			return (1);
 		}
-		else if (S_ISREG(buffer.st_mode))
-		{
-			std::cout << path << " is a file" << std::endl;
-			return (2);
-		}
-		else
-		{
-			std::cout << path << " is not a file or directory" << std::endl;
-			return (3);
-		}
-	}
-	else
-	{
-		std::cout << path << " does not exist" << std::endl;
-		return (0);
 	}
 	return (0);
 }
@@ -273,14 +294,17 @@ void GetResponse(std::deque<server> &Srv, clients_info &client)
 	std::deque<server>::iterator itSrv;
 	size_t i = 0;
 	std::string file;
-
+	std::cout <<"----------------------------req  "<< client.path<< std::endl;
 	itSrv = select_server(Srv, client);
 	if (itSrv == Srv.end())
 		itSrv = Srv.begin();
 
 	itLoc = location_match(itSrv->locations, client.path);
 
-	std::cout << "Loc _____ " << client.path << std::endl;
+
+	std::cout << "Loc _____ " << itLoc->path_location<< std::endl;
+	std::cout << "rdiLoc _____ " << itLoc->redirection<< std::endl;
+
 
 	if (itLoc == itSrv->locations.end())
 	{
@@ -291,12 +315,13 @@ void GetResponse(std::deque<server> &Srv, clients_info &client)
 	{
 		if (!itLoc->redirection.empty())
 		{
+			std::cout << "-------------rdi------------\n";
 			client.flagRed = true;
 			ft_redi(itLoc->redirection, client);
 		}
 		else
 		{
-			if (is_fileOrDir(client.path) == 1)
+			if (is_fileOrDir(client.path))
 			{
 
 				if (itLoc->auto_index == "on")
@@ -316,10 +341,7 @@ void GetResponse(std::deque<server> &Srv, clients_info &client)
 							i++;
 					}
 					if (i == itLoc->index.size())
-					{
-						std::cout << "not found \n";
-						client.flagRed = true;
-					}
+						err_404(client);
 				}
 			}
 			else
@@ -347,8 +369,9 @@ void GetResponse(std::deque<server> &Srv, clients_info &client)
 	}
 	else
 	{
-		std::cout << "405 Method Not Allowed\n";
-		client.flagRed = true;
+		std::cout << "aghjaghja\n";
+		err_405(client);
+		// client.flagRed = true;
 	}
 	//////////////
 

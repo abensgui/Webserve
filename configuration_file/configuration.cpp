@@ -55,6 +55,7 @@ int     confi::setup_configuration(std::string file)
                         }
                         lc.path_location = value;
                         lc.auto_index = "on";
+                        // lc.redirection = "";
                         while (getline(congi_file, line))
                         {
                             std::string key_local, value_local;
@@ -72,6 +73,11 @@ int     confi::setup_configuration(std::string file)
                                 sr.locations.push_back(lc);
                                 lc.allow_methods.clear();
                                 lc.index.clear();
+                                lc.path_location.clear();
+                                lc.root.clear();
+                                lc.upload_pass.clear();
+                                lc.auto_index.clear();
+                                lc.redirection.clear();
                                 break;
                             }
                             if (!key_local.compare("allow_methods"))
