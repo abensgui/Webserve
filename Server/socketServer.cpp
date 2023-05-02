@@ -13,9 +13,6 @@ clients_info &clients_info::operator=(const clients_info &obj)
     addr_len = obj.addr_len;
     address = obj.address;
     socket_client_id = obj.socket_client_id;
-//    ba9i (request, obj.request);
-//    ba9i (response, obj.response);
-    flag_header = obj.flag_header;
     file.open(obj.path_file, std::ios::in | std::ios::binary | std::ios::out);
     file << obj.file.rdbuf();
     size = obj.size;
@@ -27,14 +24,15 @@ clients_info &clients_info::operator=(const clients_info &obj)
     port = obj.port;
     map_request = obj.map_request;
     content_len = obj.content_len;
+    content_len_exist = obj.content_len_exist;
+    chunked_exist = obj.chunked_exist;
     len_rd = obj.len_rd;
+    end_header = obj.end_header;
+    end_chunk = obj.end_chunk;
+    flag_header = obj.flag_header;
     flag_res = obj.flag_res;
     flag_req = obj.flag_req;
-//    file.copyfmt(obj.file);
-//    file << obj.file.rdbuf();
-//    file.clear(obj.file.rdstate());
-//    file.seekg(0, std::ios::beg);
-//    file.seekp(0, std::ios::beg);
+    flagRed = obj.flagRed;
 
     return *this;
 }
@@ -60,11 +58,18 @@ int SocketServer::get_client()
     clients.push_back(add_new);
     index_client = clients.size() - 1;
     clients[index_client].addr_len = sizeof(clients[index_client].address);
-    clients[index_client].flag_header = 0;
+    bzero(clients[index_client].request, 1024);
+    bzero(clients[index_client].response, 1024);
     clients[index_client].content_len = 0;
+    clients[index_client].content_len_exist = 0;
+    clients[index_client].chunked_exist = 0;
+    clients[index_client].len_rd = 0;
+    clients[index_client].flag_header = 0;
     clients[index_client].flag_res = 0;
     clients[index_client].flag_req = 0;
-    clients[index_client].len_rd = 0;
+    clients[index_client].flagRed = 0;
+    clients[index_client].end_header = 0;
+    clients[index_client].end_chunk = 0;
     return (index_client);
 }
 
@@ -101,7 +106,6 @@ void SocketServer::wait_clients(std::deque<server> &srv)
     size_t it_client = 0;
     while (it_client < clients.size())
     {
-//        std::cout << "WAIT : index  : " << it_client << " | NUM : " << clients[it_client].socket_client_id << std::endl;
         if (clients[it_client].socket_client_id > 0)
         {
             FD_SET(clients[it_client].socket_client_id, &reads);
@@ -129,47 +133,90 @@ void SocketServer::wait_clients(std::deque<server> &srv)
 
 void SocketServer::parse_request(int it_client)
 {
-    if (clients[it_client].len_rd <= clients[it_client].content_len)
-    {
+    std::string key, value, walo, line;
+    int pos;
+    bzero(clients[it_client].request, 1024);
+    if ((clients[it_client].len_rd <= clients[it_client].content_len) || (clients[it_client].end_chunk == 0 && clients[it_client].chunked_exist == 1)) {
+
         clients[it_client].len_rd += recv(clients[it_client].socket_client_id, clients[it_client].request, 1024, 0);
+//        std::cout << "REQ : |" << clients[it_client].request << "|\n";
     }
     else
-    {
         clients[it_client].flag_res = 1;
-    }
+    std::string req = clients[it_client].request;
+    std::stringstream strm(req);
     if (clients[it_client].flag_req == 0)
-     {
-         int head = 0;
-         int pos;
-         std::string key, value, walo;
-         std::string req = clients[it_client].request;
-         std::stringstream strm(req);
-         getline(strm, clients[it_client].method, ' ');
-         getline(strm, clients[it_client].path, ' ');
-         getline(strm, clients[it_client].protocol, '\n');
-         getline(strm, walo, ' ');
-         getline(strm, walo, '\n');
-         pos = walo.find(":");
-         if (pos == -1) {
-             clients[it_client].host = walo;
-         }
-         else
-         {
-             clients[it_client].host = walo.substr(0, pos);
-             clients[it_client].port = walo.substr(pos+1, walo.length() - (pos + 2)) ;
-         }
-         while (getline(strm, key, ':') && getline(strm, value, '\n'))
-         {
-             head += key.size() + value.size();
-             if (!value.compare("\r\n\r\n"))
-             {
-                 clients[it_client].content_len = head;
-             }
-             clients[it_client].map_request[key] = value;
-         }
-         clients[it_client].content_len = atol(clients[it_client].map_request["Content-Length"].c_str()) - clients[it_client].content_len;
-         clients[it_client].flag_req = 1;
-     }
+    {
+        size_t head = 0;
+        getline(strm, clients[it_client].method, ' ');
+        getline(strm, clients[it_client].path, ' ');
+        getline(strm, clients[it_client].protocol, '\n');
+        getline(strm, walo, ' ');
+        head = clients[it_client].method.size() + 1 + clients[it_client].path.size() + 1 + clients[it_client].protocol.size() + walo.size() + 1;
+        getline(strm, walo, '\n');
+        pos = walo.find(":");
+        if (pos == -1)
+        {
+            clients[it_client].host = walo;
+            head += clients[it_client].host.size() + 1;
+        }
+        else
+        {
+            clients[it_client].host = walo.substr(0, pos);
+            clients[it_client].port = walo.substr(pos+1, walo.length() - (pos + 2)) ;
+            head += clients[it_client].host.size() + clients[it_client].port.size() + 2;
+        }
+        while (getline(strm, line, '\n'))
+        {
+            head += line.size();
+            line = line.substr(0, line.size() - 1);
+            pos = line.find(":");
+            if (pos != -1)
+            {
+                key = line.substr(0, pos);
+                value = line.substr(pos + 2);
+                clients[it_client].map_request[key] = value;
+                if (!key.compare("Content-Length"))
+                    clients[it_client].content_len_exist = 1;
+                else if (!value.compare("chunked"))
+                    clients[it_client].chunked_exist = 1;
+            }
+            else
+            {
+                key = line;
+                value = line;
+            }
+            if (key.size() == 0 && clients[it_client].end_header == 0)
+            {
+                clients[it_client].end_header = 1;
+                if (clients[it_client].content_len_exist == 1)
+                    clients[it_client].content_len = atol(clients[it_client].map_request["Content-Length"].c_str()) + head;
+                if (clients[it_client].chunked_exist == 1)
+                    clients[it_client].content_len = 0;
+            }
+            if (key == "0" && clients[it_client].chunked_exist == 1)
+                clients[it_client].end_chunk = 1;
+        }
+        clients[it_client].flag_req = 1;
+    }
+
+    while (getline(strm, line, '\n'))
+    {
+        line = line.substr(0, line.size() - 1);
+        pos = line.find(":");
+        if (pos != -1)
+        {
+            key = line.substr(0, pos);
+            value = line.substr(pos + 1);
+        }
+        else
+        {
+            key = line;
+            value = line;
+        }
+        if (key == "0" && clients[it_client].chunked_exist == 1)
+            clients[it_client].end_chunk = 1;
+    }
 }
 
 void SocketServer::connection(std::deque<server> &srv)
@@ -202,6 +249,7 @@ void SocketServer::connection(std::deque<server> &srv)
         {
             if (FD_ISSET(clients[it_client].socket_client_id, &writer))
             {
+                std::cout << "CLIENT : " << clients[it_client].socket_client_id << "\n";
                 parse_request(it_client);
 
                 if (clients[it_client].flag_res == 1)

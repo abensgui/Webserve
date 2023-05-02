@@ -22,7 +22,6 @@ class  clients_info
         int             socket_client_id;
         char            request[MAX_REQUEST_SIZE];
         char            response[MAX_REQUEST_SIZE];
-        int             flag_header;
         std::string     path_file;
         std::fstream    file;
         std::streamsize size;
@@ -34,10 +33,15 @@ class  clients_info
         clients_info& operator=(const clients_info& obj);
         ~clients_info();
         size_t      content_len;
+        int         content_len_exist;
+        int         chunked_exist;
+        int         end_header;
+        size_t      end_chunk;
         size_t      len_rd;
         int         flag_res;
         int         flag_req;
         bool        flagRed;
+        int         flag_header;
 };
 
 class SocketServer {
