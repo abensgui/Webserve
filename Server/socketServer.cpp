@@ -193,6 +193,11 @@ void SocketServer::parse_request(int it_client)
                     clients[it_client].content_len = atol(clients[it_client].map_request["Content-Length"].c_str()) + head;
                 if (clients[it_client].chunked_exist == 1)
                     clients[it_client].content_len = 0;
+                if (clients[it_client].method == "POST") {
+                    size_t pol = clients[it_client].map_request["Content-Disposition"].find("filename=");
+                    clients[it_client].filename_post = clients[it_client].map_request["Content-Disposition"].substr(
+                            pol + 10, clients[it_client].map_request["Content-Disposition"].size() - (pol + 11));
+                }
             }
             if (key == "0" && clients[it_client].chunked_exist == 1)
                 clients[it_client].end_chunk = 1;
@@ -249,7 +254,6 @@ void SocketServer::connection(std::deque<server> &srv)
         {
             if (FD_ISSET(clients[it_client].socket_client_id, &writer))
             {
-                std::cout << "CLIENT : " << clients[it_client].socket_client_id << "\n";
                 parse_request(it_client);
 
                 if (clients[it_client].flag_res == 1)

@@ -32,6 +32,7 @@ class  clients_info
         clients_info(const clients_info &);
         clients_info& operator=(const clients_info& obj);
         ~clients_info();
+        std::string filename_post;
         size_t      content_len;
         int         content_len_exist;
         int         chunked_exist;
@@ -43,7 +44,7 @@ class  clients_info
         bool        flagRed;
         int         flag_header;
 };
-
+//attachment; filename="bear.jpg"
 class SocketServer {
     public :
         fd_set reads, writer;

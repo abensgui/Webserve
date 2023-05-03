@@ -54,8 +54,9 @@ int     confi::setup_configuration(std::string file)
                             exit(1);
                         }
                         lc.path_location = value;
+                        //Default
                         lc.auto_index = "on";
-                        // lc.redirection = "";
+                        lc.auto_upload = "on";
                         while (getline(congi_file, line))
                         {
                             std::string key_local, value_local;
@@ -75,7 +76,7 @@ int     confi::setup_configuration(std::string file)
                                 lc.index.clear();
                                 lc.path_location.clear();
                                 lc.root.clear();
-                                lc.upload_pass.clear();
+                                lc.auto_upload.clear();
                                 lc.auto_index.clear();
                                 lc.redirection.clear();
                                 break;
@@ -86,8 +87,10 @@ int     confi::setup_configuration(std::string file)
                                 split_string(line, lc, 'i');
                             else if (!key_local.compare("root") && strm_local.eof()  && !value_local.empty())
                                 lc.root = value_local;
-                            else if (!key_local.compare("upload_pass") && strm_local.eof() && !value_local.empty())
-                                lc.upload_pass = value_local;
+                            else if (!key_local.compare("auto_upload") && strm_local.eof() && !value_local.empty())
+                                lc.auto_upload = value_local;
+                            else if (!key_local.compare("upload_path") && strm_local.eof() && !value_local.empty())
+                                lc.upload_path = value_local;
                             else if (!key_local.compare("auto_index") && strm_local.eof() && !value_local.empty())
                                 lc.auto_index = value_local;
                             else if (!key_local.compare("return") && strm_local.eof() && !value_local.empty())
