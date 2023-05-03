@@ -43,6 +43,8 @@ class  clients_info
         int         flag_req;
         bool        flagRed;
         int         flag_header;
+        std::fstream fs;
+
 };
 //attachment; filename="bear.jpg"
 class SocketServer {

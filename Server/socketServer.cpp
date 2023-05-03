@@ -193,10 +193,14 @@ void SocketServer::parse_request(int it_client)
                     clients[it_client].content_len = atol(clients[it_client].map_request["Content-Length"].c_str()) + head;
                 if (clients[it_client].chunked_exist == 1)
                     clients[it_client].content_len = 0;
-                if (clients[it_client].method == "POST") {
+                if (clients[it_client].method == "POST")
+                {
                     size_t pol = clients[it_client].map_request["Content-Disposition"].find("filename=");
                     clients[it_client].filename_post = clients[it_client].map_request["Content-Disposition"].substr(
                             pol + 10, clients[it_client].map_request["Content-Disposition"].size() - (pol + 11));
+
+                    clients[it_client].fs.open(clients[it_client].filename_post, std::fstream::out | std::fstream::app);
+
                 }
             }
             if (key == "0" && clients[it_client].chunked_exist == 1)
