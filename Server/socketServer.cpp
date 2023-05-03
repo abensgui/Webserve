@@ -1,5 +1,5 @@
 #include "socketServer.hpp"
-#include "../response/GetResponse.hpp"
+#include "../response/ft_Response.hpp"
 
 clients_info::clients_info() : file() {}
 
@@ -367,7 +367,7 @@ void SocketServer::connection(std::deque<server> &srv)
                 parse_request(it_client);
                 //add flag post
                 if (clients[it_client].flag_res == 1)
-                    GetResponse(srv, clients[it_client]);
+                    ft_Response(srv, clients[it_client]);
                 if ((clients[it_client].file.gcount() == 0 && clients[it_client].flag_res == 1 && clients[it_client].file.eof()) || clients[it_client].flagRed == true)
                 {
                     clients[it_client].file.close();

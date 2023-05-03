@@ -1,4 +1,4 @@
-#include "GetResponse.hpp"
+#include "ft_Response.hpp"
 #include <fstream>
 #include <string>
 std::string get_content_type(const char *path)
@@ -41,15 +41,11 @@ std::string get_content_type(const char *path)
 }
 void err_403(clients_info &client)
 {
-	//////////////////////////////////////////////////////////////////////////////
-	// std::cout << "lllllllllllllllllllllllllll\n";
-
 	if (client.flag_header == 0)
 	{
 		client.file.open("error/403.html", std::ios::in | std::ios::binary | std::ios::ate);
 		client.file.seekg(0, std::ios::end);
 		client.size = client.file.tellg();
-		//        std::cout << client.size << std::endl;
 		client.file.seekg(0, std::ios::beg);
 
 		if (!client.file.is_open())
@@ -64,7 +60,6 @@ void err_403(clients_info &client)
 						std::to_string(client.size) + "\r\n\r\n";
 
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
-		//        std::cout << client.header << std::endl;
 		client.flag_header = 1;
 	}
 
@@ -75,14 +70,11 @@ void err_403(clients_info &client)
 
 void err_405(clients_info &client)
 {
-	//////////////////////////////////////////////////////////////////////////////
-
 	if (client.flag_header == 0)
 	{
 		client.file.open("error/405.html", std::ios::in | std::ios::binary | std::ios::ate);
 		client.file.seekg(0, std::ios::end);
 		client.size = client.file.tellg();
-		//        std::cout << client.size << std::endl;
 		client.file.seekg(0, std::ios::beg);
 
 		if (!client.file.is_open())
@@ -98,7 +90,6 @@ void err_405(clients_info &client)
 						std::to_string(client.size) + "\r\n\r\n";
 
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
-		//        std::cout << client.header << std::endl;
 		client.flag_header = 1;
 	}
 
@@ -109,14 +100,11 @@ void err_405(clients_info &client)
 
 void err_404(clients_info &client)
 {
-	//////////////////////////////////////////////////////////////////////////////
-
 	if (client.flag_header == 0)
 	{
 		client.file.open("error/404.html", std::ios::in | std::ios::binary | std::ios::ate);
 		client.file.seekg(0, std::ios::end);
 		client.size = client.file.tellg();
-		//        std::cout << client.size << std::endl;
 		client.file.seekg(0, std::ios::beg);
 
 		if (!client.file.is_open())
@@ -131,7 +119,6 @@ void err_404(clients_info &client)
 						std::to_string(client.size) + "\r\n\r\n";
 
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
-		//        std::cout << client.header << std::endl;
 		client.flag_header = 1;
 	}
 
@@ -142,8 +129,6 @@ void err_404(clients_info &client)
 
 void ok_200(clients_info &client, std::string file)
 {
-	//////////////////////////////////////////////////////////////////////////////
-
 	if (client.flag_header == 0)
 	{
 		client.path_file = file;
@@ -169,15 +154,40 @@ void ok_200(clients_info &client, std::string file)
 		client.flag_header = 1;
 	}
 
+<<<<<<< HEAD:response/GetResponse.cpp
 	client.file.read(client.response, MAX_SIZE);
 	send(client.socket_client_id, client.response, MAX_SIZE, 0);
 	bzero(client.response, MAX_SIZE);
+=======
+	client.file.read(client.response, 1024);
+	send(client.socket_client_id, client.response, 1024, 0);
+	bzero(client.response, sizeof(client.response));
 }
+
+
+void created_201(clients_info &client)
+{
+	if (client.flag_header == 0)
+	{
+		client.header = "HTTP/1.1 201 created\r\n"
+						"Connection: close\r\n"
+						"Content-Type: " +
+						client.map_request["Content-Type"]+ "\r\n"
+						"Content-Length: 0" 
+						+ "\r\n\r\n";
+
+		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
+		client.flag_header = 1;
+	}
+>>>>>>> 8312edf30250d072b825f61318ac4becee43d2eb:response/ft_Response.cpp
+}
+
+
 
 void listDir(clients_info &client)
 {
-	std::stringstream output("index.html");
-	output << "<html><body><ul>";
+	std::string output;
+	output.append("<html><body><ul>");
 
 	DIR *dir;
 	struct dirent *ent;
@@ -185,7 +195,11 @@ void listDir(clients_info &client)
 	{
 		while ((ent = readdir(dir)) != NULL)
 		{
-			output << "<li>" << ent->d_name << "</li>";
+			output.append("<li><a href=\"");
+			output.append(ent->d_name);
+			output.append("\">");
+			output.append(ent->d_name);
+			output.append("</a></li>");
 		}
 		closedir(dir);
 	}
@@ -193,18 +207,21 @@ void listDir(clients_info &client)
 	{
 		perror("Unable to open directory");
 	}
-	output << "</ul></body></html>";
-	std::string s;
-	output >> s;
+	output.append("</ul></body></html>");
 	client.header = "HTTP/1.1 200 OK\r\n"
 					"Connection: close\r\n"
 					"Content-Type: "
 					"text/html\r\n"
 					"Content-Length: " +
-					std::to_string(s.size()) +
+					std::to_string(output.size()) +
 					"\r\n\r\n";
 	send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
+<<<<<<< HEAD:response/GetResponse.cpp
 	send(client.socket_client_id, output.str().c_str(), MAX_SIZE, 0);
+=======
+	send(client.socket_client_id, output.c_str(), output.length(), 0);
+	client.flagRed = true;
+>>>>>>> 8312edf30250d072b825f61318ac4becee43d2eb:response/ft_Response.cpp
 }
 
 std::string newpath(std::string path)
@@ -254,9 +271,8 @@ void ft_redi(std::string redi, clients_info &client)
 {
 	std::cout << "==========here" << std::endl;
 	client.header = "HTTP/1.1 301 Moved Permanently\r\n"
-					"Location: "+
-					redi
-					+ "\r\n\n\r";
+					"Location: " +
+					redi + "\r\n\n\r";
 	send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
 }
 
@@ -269,12 +285,10 @@ bool methodAllow(std::string met, std::deque<std::string> metA)
 			return (1);
 		it++;
 	}
-	std::cout << "-------------seg\n";
 	return (0);
 }
 bool is_fileOrDir(std::string path)
 {
-	std::cout << "--------------on----------  " << std::endl;
 	path = path.substr(1, path.length() - 1);
 	struct stat buffer;
 	if (stat(path.c_str(), &buffer) == 0)
@@ -288,146 +302,125 @@ bool is_fileOrDir(std::string path)
 	return (0);
 }
 
-void GetResponse(std::deque<server> &Srv, clients_info &client)
+void ft_get(std::deque<server>::iterator itSrv, std::deque<location>::iterator itLoc, clients_info &client)
 {
-	std::deque<location>::iterator itLoc;
-	std::deque<server>::iterator itSrv;
-	size_t i = 0;
 	std::string file;
-	std::cout <<"----------------------------req  "<< client.path<< std::endl;
-	itSrv = select_server(Srv, client);
-	if (itSrv == Srv.end())
-		itSrv = Srv.begin();
-
-	itLoc = location_match(itSrv->locations, client.path);
-
-
-	std::cout << "Loc _____ " << itLoc->path_location<< std::endl;
-	std::cout << "rdiLoc _____ " << itLoc->redirection<< std::endl;
-
-
-	if (itLoc == itSrv->locations.end())
+	size_t i = 0;
+	if (!itLoc->redirection.empty())
 	{
-		std::cout << "no location\n";
-	}
-
-	if (methodAllow(client.method, itLoc->allow_methods))
-	{
-		if (!itLoc->redirection.empty())
-		{
-			std::cout << "-------------rdi------------\n";
-			client.flagRed = true;
-			ft_redi(itLoc->redirection, client);
-		}
-		else
-		{
-			if (is_fileOrDir(client.path))
-			{
-
-				if (itLoc->auto_index == "on")
-					listDir(client);
-				else
-				{
-					while (i < itLoc->index.size())
-					{
-						std::cout << "index  " << itLoc->index[i] << std::endl;
-						std::ifstream file1(itLoc->index[i]);
-						if (file1.good())
-						{
-							std::cout << "exist\n";
-							ok_200(client, itLoc->index[i]);
-						}
-						else
-							i++;
-					}
-					if (i == itLoc->index.size())
-						err_404(client);
-				}
-			}
-			else
-			{
-				std::cout << "--------------is_file----------  " << std::endl;
-				if (!itLoc->root.empty())
-					file = itLoc->root + client.path;
-				else if (!itSrv->root.empty())
-					file = itLoc->root + client.path;
-				else
-					file = client.path;
-				std::ifstream file1(file);
-				if (file1.good())
-				{
-					std::cout << "exist\n";
-					ok_200(client, file);
-				}
-				else
-				{
-					std::cout << "file not exist\n";
-					err_404(client);
-				}
-			}
-		}
+		std::cout << "-------------rdi------------\n";
+		client.flagRed = true;
+		ft_redi(itLoc->redirection, client);
 	}
 	else
 	{
-		std::cout << "aghjaghja\n";
-		err_405(client);
-		// client.flagRed = true;
-	}
-	//////////////
+		if (is_fileOrDir(client.path))
+		{
 
-	// std::deque<location>::iterator itLoc = itSrv->locations.begin();
-	// std::string file;
-	// while (itLoc != itSrv->locations.end())
-	// {
-	// 	if (itLoc->path_location == newPath)
-	// 	{
-	// 		while (!itLoc->allow_methods[i].empty())
-	// 		{
-	// 			if (itLoc->allow_methods[i] == "GET")
-	// 				check++;
-	// 			i++;
-	// 		}
-	// 		check++;
-	// 		if (check != 2)
-	// 		{
-	// 			std::cout << "method not allow\n";
-	// 			err_404(client);
-	// 		}
-	// 		file = itLoc->root + path;
-	// 		std::cout << file << std::endl;
-	// 		std::ifstream file1(file);
-	// 		if (file1.good())
-	// 		{
-	// 			std::cout << "exist\n";
-	// 			ok_200(client, file, path);
-	// 		}
-	// 		else
-	// 		{
-	// 			std::cout << "file not exist\n";
-	// 			err_404(client);
-	// 		}
-	// 	}
-	// 	itLoc++;
-	// 	if (itLoc == itSrv->locations.end() && check == 0 && newPath != "/")
-	// 	{
-	// 		itLoc = itSrv->locations.begin();
-	// 		newPath = newpath(newPath);
-	// 	}
-	// }
-	// if (check == 0)
-	// {
-	// 	std::cout << "=========no location===============\n";
-	// 	file = itSrv->root + path;
-	// 	std::ifstream file1(file);
-	// 	if (file1.good())
-	// 	{
-	// 		std::cout << "exist\n";
-	// 		ok_200(client, file, path);
-	// 	}
-	// 	else
-	// 	{
-	// 		std::cout << "file not exist\n";
-	// 		err_404(client);
-	// 	}
-	// }
+			if (itLoc->auto_index == "on")
+				listDir(client);
+			else
+			{
+				while (i < itLoc->index.size())
+				{
+					std::cout << "index  " << itLoc->index[i] << std::endl;
+					std::ifstream file1(itLoc->index[i]);
+					if (file1.good())
+					{
+						std::cout << "exist\n";
+						ok_200(client, itLoc->index[i]);
+					}
+					else
+						i++;
+				}
+				if (i == itLoc->index.size())
+					err_404(client);
+			}
+		}
+		else
+		{
+			std::cout << "--------------is_file----------  " << std::endl;
+			if (!itLoc->root.empty())
+				file = itLoc->root + client.path;
+			else if (!itSrv->root.empty())
+				file = itLoc->root + client.path;
+			else
+				file = client.path;
+			std::ifstream file1(file);
+			if (file1.good())
+			{
+				std::cout << "exist\n";
+				ok_200(client, file);
+			}
+			else
+			{
+				std::cout << "file not exist\n";
+				err_404(client);
+			}
+		}
+	}
+}
+
+void ft_post(std::deque<location>::iterator itLoc, clients_info &client)
+{
+	if(itLoc->auto_upload == "on")
+	{
+		client.fs.open(itLoc->path_location + client.filename_post , std::fstream::out | std::fstream::app);
+	}
+	if (!itLoc->redirection.empty())
+	{
+		std::cout << "-------------rdi------------\n";
+		client.flagRed = true;
+		ft_redi(itLoc->redirection, client);
+	}
+	else
+	{
+		created_201(client);
+	}
+
+
+
+
+
+
+}
+
+void ft_delete()
+{
+}
+
+void ft_Response(std::deque<server> &Srv, clients_info &client)
+{
+	std::deque<location>::iterator itLoc;
+	std::deque<server>::iterator itSrv;
+
+	itSrv = select_server(Srv, client);
+	if (itSrv == Srv.end())
+		itSrv = Srv.begin();
+	itLoc = location_match(itSrv->locations, client.path);
+
+	if (itLoc == itSrv->locations.end())
+		err_404(client);
+	else
+	{
+		if (methodAllow(client.method, itLoc->allow_methods))
+		{
+			if (client.method == "GET")
+				ft_get(itSrv, itLoc, client);
+			else if (client.method == "POST")
+			{
+				std::cout << "post\n";
+
+				ft_post(itLoc, client);
+			}
+			else if (client.method == "DELETE")
+			{
+				std::cout << "DELETE\n";
+			}
+		}
+		else
+		{
+			err_405(client);
+		}
+	}
 }
