@@ -12,7 +12,7 @@
 #include <cstdio>
 #include "../configuration_file/configuration.hpp"
 
-#define MAX_REQUEST_SIZE 1024
+#define MAX_SIZE 2000
 
 class  clients_info
 {
@@ -20,8 +20,8 @@ class  clients_info
         socklen_t       addr_len;
         struct          sockaddr_storage address; // ??
         int             socket_client_id;
-        char            request[MAX_REQUEST_SIZE];
-        char            response[MAX_REQUEST_SIZE];
+        char            request[MAX_SIZE];
+        char            response[MAX_SIZE];
         std::string     path_file;
         std::fstream    file;
         std::streamsize size;
@@ -33,6 +33,7 @@ class  clients_info
         clients_info& operator=(const clients_info& obj);
         ~clients_info();
         std::string filename_post;
+        int         is_post;
         size_t      content_len;
         int         content_len_exist;
         int         chunked_exist;
@@ -44,6 +45,10 @@ class  clients_info
         bool        flagRed;
         int         flag_header;
         std::fstream fs;
+        //parse Req
+        std::string header_req;
+        std::string body;
+        int         end_header_req;
 
 };
 //attachment; filename="bear.jpg"
@@ -65,6 +70,7 @@ class SocketServer {
         void    connection(std::deque<server> &srv);
         //parse request
         void    parse_request(int);
+        void    parse_header(int);
 };
 
 #endif

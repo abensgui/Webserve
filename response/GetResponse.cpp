@@ -68,9 +68,9 @@ void err_403(clients_info &client)
 		client.flag_header = 1;
 	}
 
-	client.file.read(client.response, 1024);
-	send(client.socket_client_id, client.response, 1024, 0);
-	bzero(client.response, 1024);
+	client.file.read(client.response, MAX_SIZE);
+	send(client.socket_client_id, client.response, MAX_SIZE, 0);
+	bzero(client.response, MAX_SIZE);
 }
 
 void err_405(clients_info &client)
@@ -102,9 +102,9 @@ void err_405(clients_info &client)
 		client.flag_header = 1;
 	}
 
-	client.file.read(client.response, 1024);
-	send(client.socket_client_id, client.response, 1024, 0);
-	bzero(client.response, 1024);
+	client.file.read(client.response, MAX_SIZE);
+	send(client.socket_client_id, client.response, MAX_SIZE, 0);
+	bzero(client.response, MAX_SIZE);
 }
 
 void err_404(clients_info &client)
@@ -135,9 +135,9 @@ void err_404(clients_info &client)
 		client.flag_header = 1;
 	}
 
-	client.file.read(client.response, 1024);
-	send(client.socket_client_id, client.response, 1024, 0);
-	bzero(client.response, 1024);
+	client.file.read(client.response, MAX_SIZE);
+	send(client.socket_client_id, client.response, MAX_SIZE, 0);
+	bzero(client.response, MAX_SIZE);
 }
 
 void ok_200(clients_info &client, std::string file)
@@ -169,9 +169,9 @@ void ok_200(clients_info &client, std::string file)
 		client.flag_header = 1;
 	}
 
-	client.file.read(client.response, 1024);
-	send(client.socket_client_id, client.response, 1024, 0);
-	bzero(client.response, 1024);
+	client.file.read(client.response, MAX_SIZE);
+	send(client.socket_client_id, client.response, MAX_SIZE, 0);
+	bzero(client.response, MAX_SIZE);
 }
 
 void listDir(clients_info &client)
@@ -204,7 +204,7 @@ void listDir(clients_info &client)
 					std::to_string(s.size()) +
 					"\r\n\r\n";
 	send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
-	send(client.socket_client_id, output.str().c_str(), 1028, 0);
+	send(client.socket_client_id, output.str().c_str(), MAX_SIZE, 0);
 }
 
 std::string newpath(std::string path)
