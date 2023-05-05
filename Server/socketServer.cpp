@@ -231,10 +231,10 @@ void SocketServer::parse_request(int it_client)
 //{
 //    std::string key, value, walo, line;
 //    int pos;
-//    bzero(clients[it_client].request, 1024);
+//    bzero(clients[it_client].request, MAX_SIZE);
 //    if ((clients[it_client].len_rd <= clients[it_client].content_len) || (clients[it_client].end_chunk == 0 && clients[it_client].chunked_exist == 1)) {
 //
-//        clients[it_client].len_rd += recv(clients[it_client].socket_client_id, clients[it_client].request, 1024, 0);
+//        clients[it_client].len_rd += recv(clients[it_client].socket_client_id, clients[it_client].request, MAX_SIZE, 0);
 //        std::cout << "REQ : |" << clients[it_client].request << "|\n";
 //    }
 //    else
@@ -368,7 +368,8 @@ void SocketServer::connection(std::deque<server> &srv)
                 //add flag post
                 if (clients[it_client].flag_res == 1)
                     ft_Response(srv, clients[it_client]);
-                if ((clients[it_client].file.gcount() == 0 && clients[it_client].flag_res == 1 && clients[it_client].file.eof()) || clients[it_client].flagRed == true)
+                std::cout << clients[it_client].path << std::endl;
+                if ((clients[it_client].flag_res == 1 && clients[it_client].file.eof()) || clients[it_client].flagRed == true)
                 {
                     clients[it_client].file.close();
                     it_client = remove_client(clients[it_client].socket_client_id);

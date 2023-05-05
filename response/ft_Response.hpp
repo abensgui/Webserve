@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <dirent.h>
+#include <cstdio>
 #include <sys/stat.h>
 #include "../configuration_file/configuration.hpp"
 #include "../Server/socketServer.hpp"

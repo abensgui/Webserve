@@ -39,20 +39,20 @@ std::string get_content_type(const char *path)
 	}
 	return "application/octet-stream";
 }
+
 void err_403(clients_info &client)
 {
 	if (client.flag_header == 0)
 	{
-		client.file.open("error/403.html", std::ios::in | std::ios::binary | std::ios::ate);
-		client.file.seekg(0, std::ios::end);
-		client.size = client.file.tellg();
-		client.file.seekg(0, std::ios::beg);
-
 		if (!client.file.is_open())
 		{
 			err_403(client);
 			return;
 		}
+		client.file.open("error/403.html", std::ios::in | std::ios::binary | std::ios::ate);
+		client.file.seekg(0, std::ios::end);
+		client.size = client.file.tellg();
+		client.file.seekg(0, std::ios::beg);
 		client.header = "HTTP/1.1 403 Forbidden\r\n"
 						"Connection: close\r\n"
 						"Content-Type: text/html\r\n"
@@ -63,9 +63,37 @@ void err_403(clients_info &client)
 		client.flag_header = 1;
 	}
 
-	client.file.read(client.response, MAX_SIZE);
-	send(client.socket_client_id, client.response, MAX_SIZE, 0);
-	bzero(client.response, MAX_SIZE);
+	client.file.read(client.response, 1024);
+	send(client.socket_client_id, client.response, 1024, 0);
+	bzero(client.response, 1024);
+}
+
+void err_500(clients_info &client)
+{
+	if (client.flag_header == 0)
+	{
+		if (!client.file.is_open())
+		{
+			err_403(client);
+			return;
+		}
+		client.file.open("error/500.html", std::ios::in | std::ios::binary | std::ios::ate);
+		client.file.seekg(0, std::ios::end);
+		client.size = client.file.tellg();
+		client.file.seekg(0, std::ios::beg);
+		client.header = "HTTP/1.1 500 Internal Server Error\r\n"
+						"Connection: close\r\n"
+						"Content-Type: text/html\r\n"
+						"Content-Length: " +
+						std::to_string(client.size) + "\r\n\r\n";
+
+		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
+		client.flag_header = 1;
+	}
+
+	client.file.read(client.response, 1024);
+	send(client.socket_client_id, client.response, 1024, 0);
+	bzero(client.response, 1024);
 }
 
 void err_405(clients_info &client)
@@ -73,16 +101,14 @@ void err_405(clients_info &client)
 	if (client.flag_header == 0)
 	{
 		client.file.open("error/405.html", std::ios::in | std::ios::binary | std::ios::ate);
-		client.file.seekg(0, std::ios::end);
-		client.size = client.file.tellg();
-		client.file.seekg(0, std::ios::beg);
-
 		if (!client.file.is_open())
 		{
-			std::cout << "here\n";
 			err_403(client);
 			return;
 		}
+		client.file.seekg(0, std::ios::end);
+		client.size = client.file.tellg();
+		client.file.seekg(0, std::ios::beg);
 		client.header = "HTTP/1.1 405 Method Not Allowed\r\n"
 						"Connection: close\r\n"
 						"Content-Type: text/html\r\n"
@@ -93,9 +119,9 @@ void err_405(clients_info &client)
 		client.flag_header = 1;
 	}
 
-	client.file.read(client.response, MAX_SIZE);
-	send(client.socket_client_id, client.response, MAX_SIZE, 0);
-	bzero(client.response, MAX_SIZE);
+	client.file.read(client.response, 1024);
+	send(client.socket_client_id, client.response, 1024, 0);
+	bzero(client.response, 1024);
 }
 
 void err_404(clients_info &client)
@@ -122,9 +148,9 @@ void err_404(clients_info &client)
 		client.flag_header = 1;
 	}
 
-	client.file.read(client.response, MAX_SIZE);
-	send(client.socket_client_id, client.response, MAX_SIZE, 0);
-	bzero(client.response, MAX_SIZE);
+	client.file.read(client.response, 1024);
+	send(client.socket_client_id, client.response, 1024, 0);
+	bzero(client.response, 1024);
 }
 
 void ok_200(clients_info &client, std::string file)
@@ -154,16 +180,10 @@ void ok_200(clients_info &client, std::string file)
 		client.flag_header = 1;
 	}
 
-<<<<<<< HEAD:response/GetResponse.cpp
-	client.file.read(client.response, MAX_SIZE);
-	send(client.socket_client_id, client.response, MAX_SIZE, 0);
-	bzero(client.response, MAX_SIZE);
-=======
 	client.file.read(client.response, 1024);
 	send(client.socket_client_id, client.response, 1024, 0);
 	bzero(client.response, sizeof(client.response));
 }
-
 
 void created_201(clients_info &client)
 {
@@ -172,17 +192,14 @@ void created_201(clients_info &client)
 		client.header = "HTTP/1.1 201 created\r\n"
 						"Connection: close\r\n"
 						"Content-Type: " +
-						client.map_request["Content-Type"]+ "\r\n"
-						"Content-Length: 0" 
-						+ "\r\n\r\n";
+						client.map_request["Content-Type"] + "\r\n"
+															 "Content-Length: 0" +
+						"\r\n\r\n";
 
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
 		client.flag_header = 1;
 	}
->>>>>>> 8312edf30250d072b825f61318ac4becee43d2eb:response/ft_Response.cpp
 }
-
-
 
 void listDir(clients_info &client)
 {
@@ -216,12 +233,8 @@ void listDir(clients_info &client)
 					std::to_string(output.size()) +
 					"\r\n\r\n";
 	send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
-<<<<<<< HEAD:response/GetResponse.cpp
-	send(client.socket_client_id, output.str().c_str(), MAX_SIZE, 0);
-=======
 	send(client.socket_client_id, output.c_str(), output.length(), 0);
 	client.flagRed = true;
->>>>>>> 8312edf30250d072b825f61318ac4becee43d2eb:response/ft_Response.cpp
 }
 
 std::string newpath(std::string path)
@@ -302,7 +315,7 @@ bool is_fileOrDir(std::string path)
 	return (0);
 }
 
-void ft_get(std::deque<server>::iterator itSrv, std::deque<location>::iterator itLoc, clients_info &client)
+void ft_get(std::deque<location>::iterator itLoc, clients_info &client)
 {
 	std::string file;
 	size_t i = 0;
@@ -339,13 +352,18 @@ void ft_get(std::deque<server>::iterator itSrv, std::deque<location>::iterator i
 		}
 		else
 		{
+
 			std::cout << "--------------is_file----------  " << std::endl;
 			if (!itLoc->root.empty())
-				file = itLoc->root + client.path;
-			else if (!itSrv->root.empty())
-				file = itLoc->root + client.path;
+			{
+				if (itLoc->path_location != "/")
+					file = client.path.replace(0, itLoc->path_location.length(), itLoc->root);
+				else
+					file = itLoc->root + client.path;
+			}
 			else
 				file = client.path;
+			std::cout << "--------------file---------- ::: " << file << std::endl;
 			std::ifstream file1(file);
 			if (file1.good())
 			{
@@ -363,10 +381,34 @@ void ft_get(std::deque<server>::iterator itSrv, std::deque<location>::iterator i
 
 void ft_post(std::deque<location>::iterator itLoc, clients_info &client)
 {
-	if(itLoc->auto_upload == "on")
+	if (itLoc->auto_upload == "on")
 	{
-		client.fs.open(itLoc->path_location + client.filename_post , std::fstream::out | std::fstream::app);
+		client.fs.open(itLoc->path_location + client.filename_post, std::fstream::out | std::fstream::app);
+		if (!client.file.is_open())
+		{
+			std::cout << "----------500--------\n";
+		}
+		if (!itLoc->redirection.empty())
+		{
+			std::cout << "-------------rdi------------\n";
+			client.flagRed = true;
+			ft_redi(itLoc->redirection, client);
+		}
+		else
+		{
+			created_201(client);
+		}
 	}
+	else
+	{
+		std::cout << "403 Forbidden\n";
+		err_403(client);
+	}
+}
+
+void ft_delete(std::deque<location>::iterator itLoc, clients_info &client)
+{
+	std::string file;
 	if (!itLoc->redirection.empty())
 	{
 		std::cout << "-------------rdi------------\n";
@@ -375,18 +417,41 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client)
 	}
 	else
 	{
-		created_201(client);
+		if (is_fileOrDir(client.path))
+			err_404(client);
+		else
+		{
+
+			std::cout << "--------------is_file----------  " << std::endl;
+			if (!itLoc->root.empty())
+			{
+				if (itLoc->path_location != "/")
+					file = client.path.replace(0, itLoc->path_location.length(), itLoc->root);
+				else
+					file = itLoc->root + client.path;
+			}
+			else
+				file = client.path;
+			std::cout << "--------------file---------- ::: " << file << std::endl;
+			std::ifstream file1(file);
+			if (file1.good())
+			{
+				if (std::remove(file.c_str()) == 0)
+				{
+					std::puts("File successfully deleted");
+				}
+				else
+				{
+					std::perror("Error deleting file");
+				}
+			}
+			else
+			{
+				std::cout << "file not exist\n";
+				err_404(client);
+			}
+		}
 	}
-
-
-
-
-
-
-}
-
-void ft_delete()
-{
 }
 
 void ft_Response(std::deque<server> &Srv, clients_info &client)
@@ -406,7 +471,7 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 		if (methodAllow(client.method, itLoc->allow_methods))
 		{
 			if (client.method == "GET")
-				ft_get(itSrv, itLoc, client);
+				ft_get(itLoc, client);
 			else if (client.method == "POST")
 			{
 				std::cout << "post\n";
