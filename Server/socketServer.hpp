@@ -49,6 +49,7 @@ class  clients_info
         std::string header_req;
         std::string body;
         int         end_header_req;
+        bool    clear_client;
 
 };
 //attachment; filename="bear.jpg"

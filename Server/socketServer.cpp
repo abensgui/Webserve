@@ -35,6 +35,7 @@ clients_info &clients_info::operator=(const clients_info &obj)
     flag_res = obj.flag_res;
     flag_req = obj.flag_req;
     flagRed = obj.flagRed;
+    clear_client = obj.clear_client;
 
     return *this;
 }
@@ -76,6 +77,7 @@ int SocketServer::get_client()
     //request parse
 
     clients[index_client].end_header_req = 0;
+    clients[index_client].clear_client = 0;
     return (index_client);
 }
 
@@ -369,7 +371,7 @@ void SocketServer::connection(std::deque<server> &srv)
                 if (clients[it_client].flag_res == 1)
                     ft_Response(srv, clients[it_client]);
                 std::cout << clients[it_client].path << std::endl;
-                if ((clients[it_client].flag_res == 1 && clients[it_client].file.eof()) || clients[it_client].flagRed == true)
+                if (clients[it_client].clear_client == true)
                 {
                     clients[it_client].file.close();
                     it_client = remove_client(clients[it_client].socket_client_id);

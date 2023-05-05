@@ -397,6 +397,7 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client)
 		else
 		{
 			created_201(client);
+			client.flagRed = true;
 		}
 	}
 	else
@@ -487,5 +488,9 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 		{
 			err_405(client);
 		}
+	}
+	if(client.file.eof() || client.flagRed == true)
+	{
+		client.clear_client = true;
 	}
 }
