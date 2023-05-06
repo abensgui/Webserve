@@ -169,13 +169,13 @@ void SocketServer::parse_header(int client)
     while (getline(strm, line, '\n'))
     {
         line = line.substr(0, line.size() - 1);
-        // std::cout << "PARSING : " << line << "|\n";
+        // //std::cout << "PARSING : " << line << "|\n";
         pos = line.find(":");
         if (pos != -1)
         {
             key = line.substr(0, pos);
             value = line.substr(pos + 2);
-            // std::cout << "KEY : " << key << " | Value : " << value << "|\n";
+            // //std::cout << "KEY : " << key << " | Value : " << value << "|\n";
             clients[client].map_request[key] = value;
         }
         else
@@ -185,31 +185,33 @@ void SocketServer::parse_header(int client)
             clients[client].content_len = atol(value.c_str());
             clients[client].content_len_exist = 1;
         }
-        else if (!value.compare("chunked"))
-        {
-            clients[client].chunked_exist = 1;
-        }
     }
 
-    if (clients[client].method == "POST" || clients[client].method == "DELETE")
+    if (clients[client].method == "POST")
     {
-        int pol = clients[client].map_request["Content-Disposition"].find("filename=");
-        if (pol != -1)
-            clients[client].filename_post = clients[client].map_request["Content-Disposition"].substr(
-                pol + 10, clients[client].map_request["Content-Disposition"].size() - (pol + 11));
-        std::cout << "PARSING22 : " << line << "|\n";
-        if (clients[client].method == "POST")
-            clients[client].is_post = 1;
+        clients[client].is_post = 1;
+        if (clients[client].map_request.find("Transfer-Encoding") == clients[client].map_request.end())
+        {
+            //501 Not implemented
+        }
+        if (clients[client].map_request.find("Content-Length") == clients[client].map_request.end() &&
+        clients[client].map_request.find("Transfer-Encoding") == clients[client].map_request.end())
+        {
+            // 400 Bad request
+        }
+        if (clients[client].path.size() > 2048)
+        {
+            // 414 Request -URI Too Long
+        }
+
     }
 }
 
 void SocketServer::parse_request(int it_client)
 {
-    std::cout << "BODYYYYYYY111"
-              << "|\n";
+    //std::cout << "BODYYYYYYY111" << "|\n";
     int len_recived = recv(clients[it_client].socket_client_id, clients[it_client].request, MAX_SIZE, 0);
-    std::cout << "BODYYYYYYY2222"
-              << "|\n";
+    //std::cout << "BODYYYYYYY2222" << "|\n";
     if (len_recived < 0)
     {
         // drope cleint her
@@ -229,7 +231,7 @@ void SocketServer::parse_request(int it_client)
                 if (clients[it_client].is_post == 1)
                 {
                     clients[it_client].body = clients[it_client].body.substr(pol + 4);
-                    //    std::cout << "BODY |" << clients[it_client].body << "|\n";
+                    //    //std::cout << "BODY |" << clients[it_client].body << "|\n";
                     //                    clients[it_client].fs << clients[it_client].body;
                 }
                 clients[it_client].flag_res = 1;
@@ -290,8 +292,12 @@ void SocketServer::connection(std::deque<server> &srv)
             {
                 if (clients[it_client].flag_res == 0)
                 {
-                    // std::cout << "BODYYYYYYY" << "|\n";
+                    // //std::cout << "BODYYYYYYY" << "|\n";
                     parse_request(it_client);
+                    if (clients[it_client].body.size() > srv[it_srv].mx_cl_bd_size)
+                    {
+                        // 413 Request Entity Too Large
+                    }
                 }
 
                 if (clients[it_client].flag_res == 1)

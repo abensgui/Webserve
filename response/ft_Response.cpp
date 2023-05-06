@@ -79,15 +79,15 @@ void err_403(clients_info &client)
 						"Content-Length: " +
 						std::to_string(client.size) + "\r\n\r\n";
 
-		std::cout << "vvvvv\n";
+		//std::cout << "vvvvv\n";
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
 		client.flag_header = 1;
-		std::cout << "vvvvv\n";
+		//std::cout << "vvvvv\n";
 	}
 
-	std::cout << "SEND BF\n";
+	//std::cout << "SEND BF\n";
 	client.file.read(client.response, MAX_SIZE);
-	std::cout << "SEND AF\n";
+	//std::cout << "SEND AF\n";
 	send(client.socket_client_id, client.response, MAX_SIZE, 0);
 	bzero(client.response, MAX_SIZE);
 }
@@ -152,7 +152,7 @@ void err_404(clients_info &client)
 {
 	if (client.flag_header == 0)
 	{
-		std::cout << "aghfsdhgafshd\n";
+		//std::cout << "aghfsdhgafshd\n";
 
 		client.file.open("error/404.html", std::ios::in | std::ios::binary | std::ios::ate);
 		client.file.seekg(0, std::ios::end);
@@ -167,15 +167,15 @@ void err_404(clients_info &client)
 		client.header = "HTTP/1.1 404 Not Found\r\n"
 						"Connection: close\r\n"
 						"Content-Type: text/html\r\n"
-						"Content-Length: " +
-						std::to_string(client.size) + "\r\n\r\n";
+						"Content-Length: " + std::to_string(client.size) + "\r\n\r\n";
 
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
 		client.flag_header = 1;
 	}
 
 	client.file.read(client.response, MAX_SIZE);
-	send(client.socket_client_id, client.response, MAX_SIZE, 0);
+	if (client.file.gcount())
+		send(client.socket_client_id, client.response, client.file.gcount(), 0);
 	bzero(client.response, MAX_SIZE);
 }
 
@@ -183,7 +183,7 @@ void ok_200(clients_info &client, std::string file)
 {
 	if (client.flag_header == 0)
 	{
-	std::cout << "good " << file << std::endl;
+	//std::cout << "good " << file << std::endl;
 		client.path_file = file;
 		client.file.open(file, std::ios::in | std::ios::binary | std::ios::ate);
 		client.file.seekg(0, std::ios::end);
@@ -192,25 +192,23 @@ void ok_200(clients_info &client, std::string file)
 
 		if (!client.file.is_open())
 		{
-			std::cout << "----------403--------\n";
+			//std::cout << "----------403--------\n";
 			err_403(client);
 			return;
 		}
 		client.header = "HTTP/1.1 200 OK\r\n"
 						"Connection: close\r\n"
-						"Content-Type: " +
-						get_content_type(file.c_str()) + "\r\n"
-														 "Content-Length: " +
-						std::to_string(client.size) + "\r\n\r\n";
-
+						"Content-Type: " + get_content_type(file.c_str()) + "\r\n"
+						"Content-Length: " + std::to_string(client.size) + "\r\n\r\n";
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
 		client.flag_header = 1;
 	}
 
 	client.file.read(client.response, MAX_SIZE);
-	send(client.socket_client_id, client.response, MAX_SIZE, 0);
+	if (client.file.gcount())
+		send(client.socket_client_id, client.response, client.file.gcount(), 0);
 	bzero(client.response, sizeof(client.response));
-	std::cout << "good " << file << std::endl;
+	//std::cout << "good " << file << std::endl;
 
 }
 
@@ -311,7 +309,7 @@ std::deque<location>::iterator location_match(std::deque<location> &loc, std::st
 
 void ft_redi(std::string redi, clients_info &client)
 {
-	std::cout << "==========here" << std::endl;
+	//std::cout << "==========here" << std::endl;
 	client.header = "HTTP/1.1 301 Moved Permanently\r\n"
 					"Location: " +
 					redi + "\r\n\n\r";
@@ -336,7 +334,7 @@ bool is_fileOrDir(std::string path)
 	{
 		if (S_ISDIR(buffer.st_mode))
 		{
-			std::cout << path << " is a directory" << std::endl;
+			//std::cout << path << " is a directory" << std::endl;
 			return (1);
 		}
 	}
@@ -350,15 +348,15 @@ void ft_get(std::deque<location>::iterator itLoc, clients_info &client)
 	size_t i = 0;
 	if (!itLoc->redirection.empty())
 	{
-		std::cout << "-------------rdi------------\n";
+		//std::cout << "-------------rdi------------\n";
 		client.flagRed = true;
 		ft_redi(itLoc->redirection, client);
 	}
 	else
 	{
-		std::cout << "--------------is_file----------  " << std::endl;
+		// std::cout << "--------------is_file----------  "<< itLoc->path_location << std::endl;
 		file.replace(0, itLoc->path_location.length() - 1, itLoc->root);
-		std::cout << "--------------file---------- ::: " << file << std::endl;
+		// std::cout << "--------------file---------- ::: " << file << std::endl;
 		if (is_fileOrDir(file))
 		{
 
@@ -368,11 +366,11 @@ void ft_get(std::deque<location>::iterator itLoc, clients_info &client)
 			{
 				while (i < itLoc->index.size())
 				{
-					std::cout << "index  " << itLoc->index[i] << std::endl;
+					//std::cout << "index  " << itLoc->index[i] << std::endl;
 					std::ifstream file1(itLoc->index[i]);
 					if (file1.good())
 					{
-						std::cout << "exist\n";
+						//std::cout << "exist\n";
 						ok_200(client, itLoc->index[i]);
 					}
 					else
@@ -388,13 +386,13 @@ void ft_get(std::deque<location>::iterator itLoc, clients_info &client)
 			std::ifstream file1(file);
 			if (file1.good())
 			{
-				std::cout << "exist11111\n";
+				//std::cout << "exist11111\n";
 				ok_200(client, file);
-				std::cout << "exist11111\n";
+				//std::cout << "exist11111\n";
 			}
 			else
 			{
-				std::cout << "file not exist\n";
+				//std::cout << "file not exist\n";
 				err_404(client);
 			}
 		}
@@ -410,7 +408,7 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client)
 			client.fs.open(itLoc->upload_path + "/" + client.path , std::fstream::out | std::fstream::app);
 			if (!client.fs.is_open())
 			{
-				std::cout << "----------500--------\n";
+				//std::cout << "----------500--------\n";
 			}
 			client.flag_res = 0;
 			client.end_header_req = 2;
@@ -419,7 +417,7 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client)
 		{
 			if (!itLoc->redirection.empty())
 			{
-				std::cout << "-------------rdi------------\n";
+				//std::cout << "-------------rdi------------\n";
 				client.flagRed = true;
 				ft_redi(itLoc->redirection, client);
 			}
@@ -432,7 +430,7 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client)
 	}
 	else
 	{
-		std::cout << "403 Forbidden\n";
+		//std::cout << "403 Forbidden\n";
 		// char aa[] = "HTTP/1.1 200 OK\r\nDate: Wed, 21 Oct 2015 07:28:00 GMT\r\n";
 		// send(client.socket_client_id, aa, sizeof(aa), 0);
 		// client.clear_client = true;
@@ -445,7 +443,7 @@ void ft_delete(std::deque<location>::iterator itLoc, clients_info &client)
 	std::string file;
 	if (!itLoc->redirection.empty())
 	{
-		std::cout << "-------------rdi------------\n";
+		//std::cout << "-------------rdi------------\n";
 		client.flagRed = true;
 		ft_redi(itLoc->redirection, client);
 	}
@@ -456,7 +454,7 @@ void ft_delete(std::deque<location>::iterator itLoc, clients_info &client)
 		else
 		{
 
-			std::cout << "--------------is_file----------  " << std::endl;
+			//std::cout << "--------------is_file----------  " << std::endl;
 			if (!itLoc->root.empty())
 			{
 				if (itLoc->path_location != "/")
@@ -466,7 +464,7 @@ void ft_delete(std::deque<location>::iterator itLoc, clients_info &client)
 			}
 			else
 				file = client.filename_post;
-			std::cout << "--------------file---------- ::: " << file << std::endl;
+			//std::cout << "--------------file---------- ::: " << file << std::endl;
 			std::ifstream file1(file);
 			if (file1.good())
 			{
@@ -481,7 +479,7 @@ void ft_delete(std::deque<location>::iterator itLoc, clients_info &client)
 			}
 			else
 			{
-				std::cout << "file not exist\n";
+				//std::cout << "file not exist\n";
 				err_404(client);
 			}
 		}
@@ -508,14 +506,14 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 				ft_get(itLoc, client);
 			else if (client.method == "POST")
 			{
-				// std::cout << "post\n";
+				// //std::cout << "post\n";
 
 				ft_post(itLoc, client);
 			}
 			else if (client.method == "DELETE")
 			{
-				std::cout << "DELETE\n";
-				std::cout << client.filename_post << "|\n";
+				//std::cout << "DELETE\n";
+				//std::cout << client.filename_post << "|\n";
 				ft_delete(itLoc, client);
 			}
 		}
@@ -526,7 +524,7 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 	}
 	if (client.file.eof() || client.flagRed == true)
 	{
-		std::cout << "client jfille eof \n";
+		//std::cout << "client jfille eof \n";
 		client.clear_client = true;
 	}
 }
