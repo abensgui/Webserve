@@ -36,6 +36,8 @@ clients_info &clients_info::operator=(const clients_info &obj)
     flag_req = obj.flag_req;
     flagRed = obj.flagRed;
     clear_client = obj.clear_client;
+    post_finished = obj.post_finished;
+    removed = obj.removed;
 
     return *this;
 }
@@ -78,6 +80,8 @@ int SocketServer::get_client()
 
     clients[index_client].end_header_req = 0;
     clients[index_client].clear_client = 0;
+    clients[index_client].post_finished = 0;
+    clients[index_client].removed = 0;
     return (index_client);
 }
 
@@ -143,6 +147,7 @@ void SocketServer::parse_header(int client)
 {
     std::string key, value, walo, line;
     int pos = 0;
+    clients[client].header_req = clients[client].body.substr(0,clients[client].body.size() - (pos + 4));
     std::stringstream strm(clients[client].header_req);
     getline(strm, clients[client].method, ' ');
     getline(strm, clients[client].path, ' ');
@@ -151,7 +156,9 @@ void SocketServer::parse_header(int client)
     getline(strm, walo, '\n');
     pos = walo.find(":");
     if (pos == -1)
+    {
         clients[client].host = walo;
+    }
     else
     {
         clients[client].host = walo.substr(0, pos);
@@ -160,181 +167,92 @@ void SocketServer::parse_header(int client)
     while (getline(strm, line, '\n'))
     {
         line = line.substr(0, line.size() - 1);
+        // std::cout << "PARSING : " << line << "|\n";
         pos = line.find(":");
-        key = line.substr(0, pos);
-        value = line.substr(pos + 2);
-        clients[client].map_request[key] = value;
+        if (pos != -1)
+        {
+            key = line.substr(0, pos);
+            value = line.substr(pos + 2);
+            // std::cout << "KEY : " << key << " | Value : " << value << "|\n";
+            clients[client].map_request[key] = value;
+        }
+        else
+            break;
         if (!key.compare("Content-Length"))
         {
             clients[client].content_len = atol(value.c_str());
-            clients[client].len_rd = 5;
             clients[client].content_len_exist = 1;
         }
-        else if (!value.compare("chunked"))
+        else if (!value.compare("chunked")) {
             clients[client].chunked_exist = 1;
+        }
     }
 
-    if (clients[client].method == "POST")
+    if (clients[client].method == "POST" || clients[client].method == "DELETE")
     {
-        size_t pol = clients[client].map_request["Content-Disposition"].find("filename=");
-        clients[client].filename_post = clients[client].map_request["Content-Disposition"].substr(
+        int pol = clients[client].map_request["Content-Disposition"].find("filename=");
+        if (pol != -1)
+            clients[client].filename_post = clients[client].map_request["Content-Disposition"].substr(
                 pol + 10, clients[client].map_request["Content-Disposition"].size() - (pol + 11));
-        //open file
-        clients[client].fs.open(clients[client].filename_post, std::fstream::out);
+        std::cout << "PARSING22 : " << line << "|\n";
+
         clients[client].is_post = 1;
     }
 }
 
 void SocketServer::parse_request(int it_client)
 {
-    int a = 0;
-    bzero(clients[it_client].request, MAX_SIZE);
-    if ((clients[it_client].len_rd <= clients[it_client].content_len) || clients[it_client].end_header_req == 0) {
-
-        a = recv(clients[it_client].socket_client_id, clients[it_client].request, 100, 0);
-        clients[it_client].len_rd += a;
+    std::cout << "BODYYYYYYY111" << "|\n";
+    int len_recived = recv(clients[it_client].socket_client_id, clients[it_client].request, MAX_SIZE, 0);
+    std::cout << "BODYYYYYYY2222" << "|\n";
+    if (len_recived < 0)
+    {
+        //drope cleint her
+        clients[it_client].fs.close();
+        remove_client(clients[it_client].socket_client_id);
+        clients[it_client].removed = 1;
     }
     else
     {
+        if (clients[it_client].end_header_req  == 0)
+        {
+            clients[it_client].body.append(clients[it_client].request, len_recived);
+            int pol = clients[it_client].body.find("\r\n\r\n");
+            if (pol != -1)
+            {
+                parse_header(it_client);
+                if (clients[it_client].is_post == 1)
+                {
+                    clients[it_client].body = clients[it_client].body.substr(pol + 4);
+                //    std::cout << "BODY |" << clients[it_client].body << "|\n";
+//                    clients[it_client].fs << clients[it_client].body;
+                }
+                clients[it_client].flag_res = 1;
+                clients[it_client].end_header_req = 1;
+            }
+//            clients[it_client].is_post = 1;
+//            clients[it_client].fs.open("test.mp4", std::fstream::out);
+        }
+        else if (clients[it_client].is_post == 1)
+        {
+            // *9
+            clients[it_client].body.append(clients[it_client].request, len_recived);
+            if (clients[it_client].body.size() >= clients[it_client].content_len)
+            {
+                clients[it_client].post_finished = 1;
+            }
+        }
+        if (clients[it_client].post_finished)
+        {
+            clients[it_client].fs << clients[it_client].body;
+        }
+    }
+    if (len_recived < MAX_SIZE)
+    {
         clients[it_client].flag_res = 1;
-        clients[it_client].fs << clients[it_client].body;
     }
-
-    std::string req = clients[it_client].request;
-
-    // Header Request
-    int pos = req.find("\r\n\r\n");
-    if (pos != -1 && clients[it_client].flag_res == 0)
-    {
-        clients[it_client].header_req.append(clients[it_client].request, pos);
-        clients[it_client].end_header_req = 1;
-    }
-    else if (clients[it_client].end_header_req == 0)
-    {
-        clients[it_client].header_req.append(req);
-    }
-    // End Header Request
-    if (pos != -1 && clients[it_client].end_header_req == 1)
-        parse_header(it_client);
-    // Body Request
-    if (clients[it_client].end_header_req == 1 && pos != -1)
-    {
-        clients[it_client].body.append(req, pos + 4, a);
-    }
-    else if (clients[it_client].end_header_req == 1)
-    {
-        clients[it_client].body.append(clients[it_client].request, a);
-    }
-    // End Body Request
 
 }
-
-//void SocketServer::parse_request(int it_client)
-//{
-//    std::string key, value, walo, line;
-//    int pos;
-//    bzero(clients[it_client].request, MAX_SIZE);
-//    if ((clients[it_client].len_rd <= clients[it_client].content_len) || (clients[it_client].end_chunk == 0 && clients[it_client].chunked_exist == 1)) {
-//
-//        clients[it_client].len_rd += recv(clients[it_client].socket_client_id, clients[it_client].request, MAX_SIZE, 0);
-//        std::cout << "REQ : |" << clients[it_client].request << "|\n";
-//    }
-//    else
-//        clients[it_client].flag_res = 1;
-//    std::string req = clients[it_client].request;
-//    std::stringstream strm(req);
-//    if (clients[it_client].flag_req == 0)
-//    {
-//        size_t head = 0;
-//        getline(strm, clients[it_client].method, ' ');
-//        getline(strm, clients[it_client].path, ' ');
-//        getline(strm, clients[it_client].protocol, '\n');
-//        getline(strm, walo, ' ');
-//        head = clients[it_client].method.size() + 1 + clients[it_client].path.size() + 1 + clients[it_client].protocol.size() + walo.size() + 1;
-//        getline(strm, walo, '\n');
-//        pos = walo.find(":");
-//        if (pos == -1)
-//        {
-//            clients[it_client].host = walo;
-//            head += clients[it_client].host.size() + 1;
-//        }
-//        else
-//        {
-//            clients[it_client].host = walo.substr(0, pos);
-//            clients[it_client].port = walo.substr(pos+1, walo.length() - (pos + 2)) ;
-//            head += clients[it_client].host.size() + clients[it_client].port.size() + 2;
-//        }
-//        while (getline(strm, line, '\n'))
-//        {
-//            if (clients[it_client].end_header == 1)
-//            {
-//                std::cout << "I'm HEEERRREEE11\n";
-//                clients[it_client].fs << line << "\n";
-//            }
-//            head += line.size();
-//            line = line.substr(0, line.size() - 1);
-//            pos = line.find(":");
-//            if (pos != -1)
-//            {
-//                key = line.substr(0, pos);
-//                value = line.substr(pos + 2);
-//                clients[it_client].map_request[key] = value;
-//                if (!key.compare("Content-Length"))
-//                    clients[it_client].content_len_exist = 1;
-//                else if (!value.compare("chunked"))
-//                    clients[it_client].chunked_exist = 1;
-//            }
-//            else
-//            {
-//                key = line;
-//                value = line;
-//            }
-//            if (key.size() == 0 && clients[it_client].end_header == 0)
-//            {
-//                clients[it_client].end_header = 1;
-//                if (clients[it_client].content_len_exist == 1)
-//                    clients[it_client].content_len = atol(clients[it_client].map_request["Content-Length"].c_str()) + head;
-//                if (clients[it_client].chunked_exist == 1)
-//                    clients[it_client].content_len = 0;
-//                if (clients[it_client].method == "POST")
-//                {
-//                    size_t pol = clients[it_client].map_request["Content-Disposition"].find("filename=");
-//                    clients[it_client].filename_post = clients[it_client].map_request["Content-Disposition"].substr(
-//                            pol + 10, clients[it_client].map_request["Content-Disposition"].size() - (pol + 11));
-//                    //open file
-//                    clients[it_client].fs.open("bear.jpg", std::fstream::out | std::fstream::app);
-//                    clients[it_client].is_post = 1;
-//                }
-//            }
-//            if (key == "0" && clients[it_client].chunked_exist == 1)
-//                clients[it_client].end_chunk = 1;
-//        }
-//        clients[it_client].flag_req = 1;
-//    }
-//
-//    while (getline(strm, line, '\n'))
-//    {
-//        if (clients[it_client].end_header == 1)
-//        {
-//            std::cout << "I'm HEEERRREEE\n";
-//            clients[it_client].fs << line << "\n";
-//        }
-//        line = line.substr(0, line.size() - 1);
-//        pos = line.find(":");
-//        if (pos != -1)
-//        {
-//            key = line.substr(0, pos);
-//            value = line.substr(pos + 1);
-//        }
-//        else
-//        {
-//            key = line;
-//            value = line;
-//        }
-//        if (key == "0" && clients[it_client].chunked_exist == 1)
-//            clients[it_client].end_chunk = 1;
-//    }
-//}
 
 void SocketServer::connection(std::deque<server> &srv)
 {
@@ -366,17 +284,23 @@ void SocketServer::connection(std::deque<server> &srv)
         {
             if (FD_ISSET(clients[it_client].socket_client_id, &writer))
             {
-                parse_request(it_client);
-                //add flag post
-                if (clients[it_client].flag_res == 1)
+                if (clients[it_client].flag_res == 0)
+                {
+                    // std::cout << "BODYYYYYYY" << "|\n";
+                    parse_request(it_client);
+                    
+                }
+                
+                if (clients[it_client].flag_res == 1){
+
                     ft_Response(srv, clients[it_client]);
-                std::cout << clients[it_client].path << std::endl;
-                if (clients[it_client].clear_client == true)
+                    }
+
+                if (clients[it_client].clear_client == true && clients[it_client].removed == 0)
                 {
                     clients[it_client].file.close();
-                    it_client = remove_client(clients[it_client].socket_client_id);
+                    remove_client(clients[it_client].socket_client_id);
                     clients[it_client].flagRed = false;
-                    continue;
                 }
             }
             it_client++;

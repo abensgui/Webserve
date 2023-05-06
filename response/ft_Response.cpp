@@ -44,28 +44,33 @@ void err_403(clients_info &client)
 {
 	if (client.flag_header == 0)
 	{
-		if (!client.file.is_open())
-		{
-			err_403(client);
-			return;
-		}
 		client.file.open("error/403.html", std::ios::in | std::ios::binary | std::ios::ate);
 		client.file.seekg(0, std::ios::end);
 		client.size = client.file.tellg();
 		client.file.seekg(0, std::ios::beg);
+		if (!client.file.is_open())
+		{
+			//default err
+			// err_403(client);
+			return;
+		}
 		client.header = "HTTP/1.1 403 Forbidden\r\n"
 						"Connection: close\r\n"
 						"Content-Type: text/html\r\n"
 						"Content-Length: " +
 						std::to_string(client.size) + "\r\n\r\n";
 
+		std::cout << "vvvvv\n";
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
 		client.flag_header = 1;
+		std::cout << "vvvvv\n";
 	}
 
-	client.file.read(client.response, 1024);
-	send(client.socket_client_id, client.response, 1024, 0);
-	bzero(client.response, 1024);
+	std::cout << "SEND BF\n";
+	client.file.read(client.response, MAX_SIZE);
+	std::cout << "SEND AF\n";
+	send(client.socket_client_id, client.response, MAX_SIZE, 0);
+	bzero(client.response, MAX_SIZE);
 }
 
 void err_500(clients_info &client)
@@ -91,9 +96,9 @@ void err_500(clients_info &client)
 		client.flag_header = 1;
 	}
 
-	client.file.read(client.response, 1024);
-	send(client.socket_client_id, client.response, 1024, 0);
-	bzero(client.response, 1024);
+	client.file.read(client.response, MAX_SIZE);
+	send(client.socket_client_id, client.response, MAX_SIZE, 0);
+	bzero(client.response, MAX_SIZE);
 }
 
 void err_405(clients_info &client)
@@ -119,15 +124,17 @@ void err_405(clients_info &client)
 		client.flag_header = 1;
 	}
 
-	client.file.read(client.response, 1024);
-	send(client.socket_client_id, client.response, 1024, 0);
-	bzero(client.response, 1024);
+	client.file.read(client.response, MAX_SIZE);
+	send(client.socket_client_id, client.response, MAX_SIZE, 0);
+	bzero(client.response, MAX_SIZE);
 }
 
 void err_404(clients_info &client)
 {
 	if (client.flag_header == 0)
 	{
+		std::cout << "aghfsdhgafshd\n";
+
 		client.file.open("error/404.html", std::ios::in | std::ios::binary | std::ios::ate);
 		client.file.seekg(0, std::ios::end);
 		client.size = client.file.tellg();
@@ -148,9 +155,9 @@ void err_404(clients_info &client)
 		client.flag_header = 1;
 	}
 
-	client.file.read(client.response, 1024);
-	send(client.socket_client_id, client.response, 1024, 0);
-	bzero(client.response, 1024);
+	client.file.read(client.response, MAX_SIZE);
+	send(client.socket_client_id, client.response, MAX_SIZE, 0);
+	bzero(client.response, MAX_SIZE);
 }
 
 void ok_200(clients_info &client, std::string file)
@@ -180,8 +187,8 @@ void ok_200(clients_info &client, std::string file)
 		client.flag_header = 1;
 	}
 
-	client.file.read(client.response, 1024);
-	send(client.socket_client_id, client.response, 1024, 0);
+	client.file.read(client.response, MAX_SIZE);
+	send(client.socket_client_id, client.response, MAX_SIZE, 0);
 	bzero(client.response, sizeof(client.response));
 }
 
@@ -383,26 +390,37 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client)
 {
 	if (itLoc->auto_upload == "on")
 	{
-		client.fs.open(itLoc->path_location + client.filename_post, std::fstream::out | std::fstream::app);
-		if (!client.file.is_open())
+		if (client.end_header_req == 1)
 		{
-			std::cout << "----------500--------\n";
+			client.fs.open(itLoc->upload_path + "/" + client.filename_post, std::fstream::out | std::fstream::app);
+			if (!client.fs.is_open())
+			{
+				std::cout << "----------500--------\n";
+			}
+			client.flag_res = 0;
+			client.end_header_req = 2;
 		}
-		if (!itLoc->redirection.empty())
+		if (client.post_finished)
 		{
-			std::cout << "-------------rdi------------\n";
-			client.flagRed = true;
-			ft_redi(itLoc->redirection, client);
-		}
-		else
-		{
-			created_201(client);
-			client.flagRed = true;
+			if (!itLoc->redirection.empty())
+			{
+				std::cout << "-------------rdi------------\n";
+				client.flagRed = true;
+				ft_redi(itLoc->redirection, client);
+			}
+			else
+			{
+				created_201(client);
+				client.flagRed = true;
+			}
 		}
 	}
 	else
 	{
 		std::cout << "403 Forbidden\n";
+	 	//char aa[] = "HTTP/1.1 200 OK\r\nDate: Wed, 21 Oct 2015 07:28:00 GMT\r\n";
+	 	//send(client.socket_client_id, aa, sizeof(aa), 0);
+		//client.clear_client = true;
 		err_403(client);
 	}
 }
@@ -475,13 +493,15 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 				ft_get(itLoc, client);
 			else if (client.method == "POST")
 			{
-				std::cout << "post\n";
+				// std::cout << "post\n";
 
 				ft_post(itLoc, client);
 			}
 			else if (client.method == "DELETE")
 			{
 				std::cout << "DELETE\n";
+				std::cout << client.filename_post << "|\n";
+				ft_delete(itLoc, client);
 			}
 		}
 		else
@@ -489,8 +509,9 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 			err_405(client);
 		}
 	}
-	if(client.file.eof() || client.flagRed == true)
+	if (client.file.eof() || client.flagRed == true)
 	{
+		std::cout << "client jfille eof \n";
 		client.clear_client = true;
 	}
 }
