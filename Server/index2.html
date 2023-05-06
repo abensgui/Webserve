@@ -16,7 +16,7 @@
             var input = document.querySelector('input[type="file"]')
             const file = input.files[0];
 
-            fetch('/', {
+            fetch(`/${file.name}`, {
                 method: 'POST',
                 mode: 'cors',
                 body: input.files[0],

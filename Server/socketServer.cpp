@@ -76,7 +76,7 @@ int SocketServer::get_client()
     clients[index_client].end_header = 0;
     clients[index_client].end_chunk = 0;
     clients[index_client].is_post = 0;
-    //request parse
+    // request parse
 
     clients[index_client].end_header_req = 0;
     clients[index_client].clear_client = 0;
@@ -85,7 +85,7 @@ int SocketServer::get_client()
     return (index_client);
 }
 
-int  SocketServer::remove_client(int socket_client)
+int SocketServer::remove_client(int socket_client)
 {
     size_t it_client = 0;
     while (it_client < clients.size())
@@ -121,7 +121,8 @@ void SocketServer::wait_clients(std::deque<server> &srv)
         if (clients[it_client].socket_client_id > 0)
         {
             FD_SET(clients[it_client].socket_client_id, &reads);
-            if (clients[it_client].socket_client_id > max_socket) {
+            if (clients[it_client].socket_client_id > max_socket)
+            {
                 max_socket = clients[it_client].socket_client_id;
             }
         }
@@ -133,7 +134,8 @@ void SocketServer::wait_clients(std::deque<server> &srv)
         if (clients[it_client].socket_client_id > 0)
         {
             FD_SET(clients[it_client].socket_client_id, &writer);
-            if (clients[it_client].socket_client_id > max_socket) {
+            if (clients[it_client].socket_client_id > max_socket)
+            {
                 max_socket = clients[it_client].socket_client_id;
             }
         }
@@ -147,7 +149,7 @@ void SocketServer::parse_header(int client)
 {
     std::string key, value, walo, line;
     int pos = 0;
-    clients[client].header_req = clients[client].body.substr(0,clients[client].body.size() - (pos + 4));
+    clients[client].header_req = clients[client].body.substr(0, clients[client].body.size() - (pos + 4));
     std::stringstream strm(clients[client].header_req);
     getline(strm, clients[client].method, ' ');
     getline(strm, clients[client].path, ' ');
@@ -162,7 +164,7 @@ void SocketServer::parse_header(int client)
     else
     {
         clients[client].host = walo.substr(0, pos);
-        clients[client].port = walo.substr(pos+1, walo.length() - (pos + 2)) ;
+        clients[client].port = walo.substr(pos + 1, walo.length() - (pos + 2));
     }
     while (getline(strm, line, '\n'))
     {
@@ -183,7 +185,8 @@ void SocketServer::parse_header(int client)
             clients[client].content_len = atol(value.c_str());
             clients[client].content_len_exist = 1;
         }
-        else if (!value.compare("chunked")) {
+        else if (!value.compare("chunked"))
+        {
             clients[client].chunked_exist = 1;
         }
     }
@@ -195,26 +198,28 @@ void SocketServer::parse_header(int client)
             clients[client].filename_post = clients[client].map_request["Content-Disposition"].substr(
                 pol + 10, clients[client].map_request["Content-Disposition"].size() - (pol + 11));
         std::cout << "PARSING22 : " << line << "|\n";
-
-        clients[client].is_post = 1;
+        if (clients[client].method == "POST")
+            clients[client].is_post = 1;
     }
 }
 
 void SocketServer::parse_request(int it_client)
 {
-    std::cout << "BODYYYYYYY111" << "|\n";
+    std::cout << "BODYYYYYYY111"
+              << "|\n";
     int len_recived = recv(clients[it_client].socket_client_id, clients[it_client].request, MAX_SIZE, 0);
-    std::cout << "BODYYYYYYY2222" << "|\n";
+    std::cout << "BODYYYYYYY2222"
+              << "|\n";
     if (len_recived < 0)
     {
-        //drope cleint her
+        // drope cleint her
         clients[it_client].fs.close();
         remove_client(clients[it_client].socket_client_id);
         clients[it_client].removed = 1;
     }
     else
     {
-        if (clients[it_client].end_header_req  == 0)
+        if (clients[it_client].end_header_req == 0)
         {
             clients[it_client].body.append(clients[it_client].request, len_recived);
             int pol = clients[it_client].body.find("\r\n\r\n");
@@ -224,14 +229,14 @@ void SocketServer::parse_request(int it_client)
                 if (clients[it_client].is_post == 1)
                 {
                     clients[it_client].body = clients[it_client].body.substr(pol + 4);
-                //    std::cout << "BODY |" << clients[it_client].body << "|\n";
-//                    clients[it_client].fs << clients[it_client].body;
+                    //    std::cout << "BODY |" << clients[it_client].body << "|\n";
+                    //                    clients[it_client].fs << clients[it_client].body;
                 }
                 clients[it_client].flag_res = 1;
                 clients[it_client].end_header_req = 1;
             }
-//            clients[it_client].is_post = 1;
-//            clients[it_client].fs.open("test.mp4", std::fstream::out);
+            //            clients[it_client].is_post = 1;
+            //            clients[it_client].fs.open("test.mp4", std::fstream::out);
         }
         else if (clients[it_client].is_post == 1)
         {
@@ -251,7 +256,6 @@ void SocketServer::parse_request(int it_client)
     {
         clients[it_client].flag_res = 1;
     }
-
 }
 
 void SocketServer::connection(std::deque<server> &srv)
@@ -288,13 +292,13 @@ void SocketServer::connection(std::deque<server> &srv)
                 {
                     // std::cout << "BODYYYYYYY" << "|\n";
                     parse_request(it_client);
-                    
                 }
-                
-                if (clients[it_client].flag_res == 1){
+
+                if (clients[it_client].flag_res == 1)
+                {
 
                     ft_Response(srv, clients[it_client]);
-                    }
+                }
 
                 if (clients[it_client].clear_client == true && clients[it_client].removed == 0)
                 {

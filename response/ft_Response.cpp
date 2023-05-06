@@ -40,6 +40,25 @@ std::string get_content_type(const char *path)
 	return "application/octet-stream";
 }
 
+void ft_202(clients_info &client)
+{
+
+	client.file.open("error/403.html", std::ios::in | std::ios::binary | std::ios::ate);
+	client.file.seekg(0, std::ios::end);
+	client.size = client.file.tellg();
+	client.file.seekg(0, std::ios::beg);
+	if (!client.file.is_open())
+	{
+		// default err
+		//  err_403(client);
+		return;
+	}
+	client.header = "HTTP/1.1 202 Accepted\r\n\r\n";
+
+	send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
+	client.clear_client = 1;
+}
+
 void err_403(clients_info &client)
 {
 	if (client.flag_header == 0)
@@ -50,8 +69,8 @@ void err_403(clients_info &client)
 		client.file.seekg(0, std::ios::beg);
 		if (!client.file.is_open())
 		{
-			//default err
-			// err_403(client);
+			// default err
+			//  err_403(client);
 			return;
 		}
 		client.header = "HTTP/1.1 403 Forbidden\r\n"
@@ -164,6 +183,7 @@ void ok_200(clients_info &client, std::string file)
 {
 	if (client.flag_header == 0)
 	{
+	std::cout << "good " << file << std::endl;
 		client.path_file = file;
 		client.file.open(file, std::ios::in | std::ios::binary | std::ios::ate);
 		client.file.seekg(0, std::ios::end);
@@ -190,6 +210,8 @@ void ok_200(clients_info &client, std::string file)
 	client.file.read(client.response, MAX_SIZE);
 	send(client.socket_client_id, client.response, MAX_SIZE, 0);
 	bzero(client.response, sizeof(client.response));
+	std::cout << "good " << file << std::endl;
+
 }
 
 void created_201(clients_info &client)
@@ -208,14 +230,14 @@ void created_201(clients_info &client)
 	}
 }
 
-void listDir(clients_info &client)
+void listDir(clients_info &client, std::string file)
 {
 	std::string output;
 	output.append("<html><body><ul>");
 
 	DIR *dir;
 	struct dirent *ent;
-	if ((dir = opendir(client.path.substr(1, client.path.length() - 1).c_str())) != NULL)
+	if ((dir = opendir(file.c_str())) != NULL)
 	{
 		while ((ent = readdir(dir)) != NULL)
 		{
@@ -309,7 +331,6 @@ bool methodAllow(std::string met, std::deque<std::string> metA)
 }
 bool is_fileOrDir(std::string path)
 {
-	path = path.substr(1, path.length() - 1);
 	struct stat buffer;
 	if (stat(path.c_str(), &buffer) == 0)
 	{
@@ -325,6 +346,7 @@ bool is_fileOrDir(std::string path)
 void ft_get(std::deque<location>::iterator itLoc, clients_info &client)
 {
 	std::string file;
+	file = client.path;
 	size_t i = 0;
 	if (!itLoc->redirection.empty())
 	{
@@ -334,11 +356,14 @@ void ft_get(std::deque<location>::iterator itLoc, clients_info &client)
 	}
 	else
 	{
-		if (is_fileOrDir(client.path))
+		std::cout << "--------------is_file----------  " << std::endl;
+		file.replace(0, itLoc->path_location.length() - 1, itLoc->root);
+		std::cout << "--------------file---------- ::: " << file << std::endl;
+		if (is_fileOrDir(file))
 		{
 
 			if (itLoc->auto_index == "on")
-				listDir(client);
+				listDir(client, file);
 			else
 			{
 				while (i < itLoc->index.size())
@@ -360,22 +385,12 @@ void ft_get(std::deque<location>::iterator itLoc, clients_info &client)
 		else
 		{
 
-			std::cout << "--------------is_file----------  " << std::endl;
-			if (!itLoc->root.empty())
-			{
-				if (itLoc->path_location != "/")
-					file = client.path.replace(0, itLoc->path_location.length(), itLoc->root);
-				else
-					file = itLoc->root + client.path;
-			}
-			else
-				file = client.path;
-			std::cout << "--------------file---------- ::: " << file << std::endl;
 			std::ifstream file1(file);
 			if (file1.good())
 			{
-				std::cout << "exist\n";
+				std::cout << "exist11111\n";
 				ok_200(client, file);
+				std::cout << "exist11111\n";
 			}
 			else
 			{
@@ -392,7 +407,7 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client)
 	{
 		if (client.end_header_req == 1)
 		{
-			client.fs.open(itLoc->upload_path + "/" + client.filename_post, std::fstream::out | std::fstream::app);
+			client.fs.open(itLoc->upload_path + "/" + client.path , std::fstream::out | std::fstream::app);
 			if (!client.fs.is_open())
 			{
 				std::cout << "----------500--------\n";
@@ -418,9 +433,9 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client)
 	else
 	{
 		std::cout << "403 Forbidden\n";
-	 	//char aa[] = "HTTP/1.1 200 OK\r\nDate: Wed, 21 Oct 2015 07:28:00 GMT\r\n";
-	 	//send(client.socket_client_id, aa, sizeof(aa), 0);
-		//client.clear_client = true;
+		// char aa[] = "HTTP/1.1 200 OK\r\nDate: Wed, 21 Oct 2015 07:28:00 GMT\r\n";
+		// send(client.socket_client_id, aa, sizeof(aa), 0);
+		// client.clear_client = true;
 		err_403(client);
 	}
 }
@@ -445,19 +460,19 @@ void ft_delete(std::deque<location>::iterator itLoc, clients_info &client)
 			if (!itLoc->root.empty())
 			{
 				if (itLoc->path_location != "/")
-					file = client.path.replace(0, itLoc->path_location.length(), itLoc->root);
+					file = client.filename_post.replace(0, itLoc->path_location.length(), itLoc->root);
 				else
-					file = itLoc->root + client.path;
+					file = itLoc->root + "/" + client.filename_post;
 			}
 			else
-				file = client.path;
+				file = client.filename_post;
 			std::cout << "--------------file---------- ::: " << file << std::endl;
 			std::ifstream file1(file);
 			if (file1.good())
 			{
 				if (std::remove(file.c_str()) == 0)
 				{
-					std::puts("File successfully deleted");
+					ft_202(client);
 				}
 				else
 				{
