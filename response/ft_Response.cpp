@@ -430,10 +430,6 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client)
 	}
 	else
 	{
-		//std::cout << "403 Forbidden\n";
-		// char aa[] = "HTTP/1.1 200 OK\r\nDate: Wed, 21 Oct 2015 07:28:00 GMT\r\n";
-		// send(client.socket_client_id, aa, sizeof(aa), 0);
-		// client.clear_client = true;
 		err_403(client);
 	}
 }

@@ -8,7 +8,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <map>
-#include <vector>
 #include <cstdio>
 #include "../configuration_file/configuration.hpp"
 
@@ -32,16 +31,13 @@ class  clients_info
         clients_info(const clients_info &);
         clients_info& operator=(const clients_info& obj);
         ~clients_info();
+        // hada mo7al wax ba9in 5damin bih
         std::string filename_post;
+        //end
         int         is_post;
         size_t      content_len;
-        int         content_len_exist;
-        int         chunked_exist;
         int         end_header;
-        size_t      end_chunk;
-        size_t      len_rd;
         int         flag_res;
-        int         flag_req;
         bool        flagRed;
         int         flag_header;
         std::fstream fs;
@@ -49,12 +45,12 @@ class  clients_info
         std::string header_req;
         std::string body;
         int         end_header_req;
-        bool    clear_client;
-        int post_finished;
-        int     removed;
+        bool        clear_client;
+        int         post_finished;
+        int         removed;
 
 };
-//attachment; filename="bear.jpg"
+
 class SocketServer {
     public :
         fd_set reads, writer;
@@ -66,10 +62,9 @@ class SocketServer {
         void    run_server(std::deque<server> &servers);
         std::deque<clients_info> clients;
 
-        int get_client();
-//        void    remove_client(int socket_client);
-        int remove_client(int socket_client);
-        void  wait_clients(std::deque<server> &srv);
+        int     get_client();
+        int     remove_client(int socket_client);
+        void    wait_clients(std::deque<server> &srv);
         void    connection(std::deque<server> &srv);
         //parse request
         void    parse_request(int);
