@@ -201,24 +201,26 @@ void SocketServer::run_server(std::deque<server> &servers)
     // 1 - creat socket for each server
     while (i < servers.size())
     {
-        servers[i].socket_id = socket(AF_INET, SOCK_STREAM, 0);
+        memset(&ServerAddr, 0, sizeof(ServerAddr));
+        ServerAddr.ai_family = AF_INET;
+        ServerAddr.ai_socktype = SOCK_STREAM;
+        ServerAddr.ai_flags = AI_PASSIVE;
+        struct addrinfo *bindi;
+        getaddrinfo(servers[i].host.c_str(), servers[i].port.c_str(), &ServerAddr, &bindi);
+        servers[i].socket_id = socket(bindi->ai_family, bindi->ai_socktype, bindi->ai_protocol);
         if (servers[i].socket_id < 0)
             exit(1);
         std::cout << "Creating socket... " << servers[i].socket_id << std::endl;
         int opt_val = 1;
         setsockopt(servers[i].socket_id, SOL_SOCKET, SO_REUSEPORT, &opt_val, sizeof(opt_val));
-        // 2 - binding socket ma3a l port d server
-        struct sockaddr_in ServerAddr;
-        memset(&ServerAddr, 0, sizeof(ServerAddr));
-        ServerAddr.sin_family = AF_INET;
-        ServerAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-        ServerAddr.sin_port = htons(atoi(servers[i].port.c_str()));
-        if (bind(servers[i].socket_id, (struct sockaddr *)&ServerAddr, sizeof(ServerAddr)))
+        // // 2 - binding socket ma3a l port d server
+        if (bind(servers[i].socket_id, bindi->ai_addr, bindi->ai_addrlen))
         {
             std::cout << "Error In Bind Server\n";
             exit(1);
         }
         std::cout << "Binding socket to local address...\n";
+        freeaddrinfo(bindi);
         // 3- Listen to the Clients connection request
         if (listen(servers[i].socket_id, 128))
         {

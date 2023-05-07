@@ -2,6 +2,7 @@
 #define SOCKETSERVER_HPP
 
 #include <sys/socket.h>
+#include <netdb.h>
 #include <sys/select.h>
 #include <sys/time.h>
 #include <netinet/in.h>
@@ -55,6 +56,7 @@ class SocketServer {
     public :
         fd_set reads, writer;
         struct timeval time;
+        struct addrinfo ServerAddr;
         SocketServer();
         SocketServer(SocketServer const &cpy);
         ~SocketServer();

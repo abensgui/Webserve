@@ -25,13 +25,11 @@ void SocketServer::parse_header(int client)
     while (getline(strm, line, '\n'))
     {
         line = line.substr(0, line.size() - 1);
-        // //std::cout << "PARSING : " << line << "|\n";
         pos = line.find(":");
         if (pos != -1)
         {
             key = line.substr(0, pos);
             value = line.substr(pos + 2);
-            // //std::cout << "KEY : " << key << " | Value : " << value << "|\n";
             clients[client].map_request[key] = value;
         }
         else
@@ -56,18 +54,14 @@ void SocketServer::parse_header(int client)
         {
             // 414 Request -URI Too Long
         }
-
     }
 }
 
 void SocketServer::parse_request(int it_client)
 {
-    //std::cout << "BODYYYYYYY111" << "|\n";
     int len_recived = recv(clients[it_client].socket_client_id, clients[it_client].request, MAX_SIZE, 0);
-    //std::cout << "BODYYYYYYY2222" << "|\n";
     if (len_recived < 0)
     {
-        // drope cleint her
         clients[it_client].fs.close();
         remove_client(clients[it_client].socket_client_id);
         clients[it_client].removed = 1;
@@ -82,20 +76,13 @@ void SocketServer::parse_request(int it_client)
             {
                 parse_header(it_client);
                 if (clients[it_client].is_post == 1)
-                {
                     clients[it_client].body = clients[it_client].body.substr(pol + 4);
-                    //    //std::cout << "BODY |" << clients[it_client].body << "|\n";
-                    //                    clients[it_client].fs << clients[it_client].body;
-                }
                 clients[it_client].flag_res = 1;
                 clients[it_client].end_header_req = 1;
             }
-            //            clients[it_client].is_post = 1;
-            //            clients[it_client].fs.open("test.mp4", std::fstream::out);
         }
         else if (clients[it_client].is_post == 1)
         {
-            // *9
             clients[it_client].body.append(clients[it_client].request, len_recived);
             if (clients[it_client].body.size() >= clients[it_client].content_len)
             {
