@@ -38,6 +38,13 @@ int     confi::setup_configuration(std::string file)
             {
                 i = 0;
                 j = -1;
+                sr.err_pages["201"] = "error/201.html";
+                sr.err_pages["202"] = "error/202.html";
+                sr.err_pages["403"] = "error/403.html";
+                sr.err_pages["404"] = "error/404.html";
+                sr.err_pages["405"] = "error/405.html";
+                sr.err_pages["500"] = "error/500.html";
+
                 while (getline(congi_file, line))
                 {
                     std::stringstream strm(line);

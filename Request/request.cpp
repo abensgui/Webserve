@@ -79,6 +79,11 @@ void SocketServer::parse_request(int it_client)
                     clients[it_client].body = clients[it_client].body.substr(pol + 4);
                 clients[it_client].flag_res = 1;
                 clients[it_client].end_header_req = 1;
+                if (clients[it_client].body.size() >= clients[it_client].content_len)
+                {
+                    clients[it_client].post_finished = 1;
+                    clients[it_client].fs << clients[it_client].body;
+                }
             }
         }
         else if (clients[it_client].is_post == 1)
