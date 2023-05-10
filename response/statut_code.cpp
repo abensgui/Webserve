@@ -150,7 +150,6 @@ void ok_200(clients_info &client, std::string file, std::map<std::string, std::s
 						get_content_type(file.c_str()) + "\r\n"
 														 "Content-Length: " +
 						std::to_string(client.size) + "\r\n\r\n";
-		std::cout << client.header << std::endl;
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
 		client.flag_header = 1;
 	}
@@ -178,7 +177,6 @@ void created_201(clients_info &client, std::map<std::string, std::string> err_pa
 						"Content-Type: text/html\r\n"
 						"Content-Length: " +
 						std::to_string(client.size) + "\r\n\r\n";
-		std::cout << client.header << std::endl;
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
 		client.flag_header = 1;
 	}

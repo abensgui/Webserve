@@ -22,6 +22,8 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client, std::ma
 		}
 		if (client.post_finished)
 		{
+			if (client.body.size() >= client.content_len)
+				client.fs << client.body;
 			if (!itLoc->redirection.empty())
 			{
 				client.flagRed = true;

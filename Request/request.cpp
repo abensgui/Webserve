@@ -36,24 +36,25 @@ void SocketServer::parse_header(int client)
             break;
         if (!key.compare("Content-Length"))
             clients[client].content_len = atol(value.c_str());
+        if (!key.compare("Content-Length"))
+            clients[client].is_chunk = 1;
     }
 
     if (clients[client].method == "POST")
     {
         clients[client].is_post = 1;
-        if (clients[client].map_request.find("Transfer-Encoding") == clients[client].map_request.end())
+        if (clients[client].map_request.find("Transfer-Encoding") != clients[client].map_request.end())
         {
             //501 Not implemented
         }
-        if (clients[client].map_request.find("Content-Length") == clients[client].map_request.end() &&
-        clients[client].map_request.find("Transfer-Encoding") == clients[client].map_request.end())
+        if (clients[client].map_request.find("Content-Length") == clients[client].map_request.end())
         {
             // 400 Bad request
         }
-        if (clients[client].path.size() > 2048)
-        {
-            // 414 Request -URI Too Long
-        }
+    }
+    if (clients[client].path.size() > 2048)
+    {
+        // 414 Request -URI Too Long
     }
 }
 
@@ -82,7 +83,7 @@ void SocketServer::parse_request(int it_client)
                 if (clients[it_client].body.size() >= clients[it_client].content_len)
                 {
                     clients[it_client].post_finished = 1;
-                    clients[it_client].fs << clients[it_client].body;
+                    // clients[it_client].fs << clients[it_client].body;
                 }
             }
         }
@@ -92,7 +93,8 @@ void SocketServer::parse_request(int it_client)
             if (clients[it_client].body.size() >= clients[it_client].content_len)
             {
                 clients[it_client].post_finished = 1;
-                clients[it_client].fs << clients[it_client].body;
+                // clients[it_client].fs << clients[it_client].body;
+                // clients[it_client].body.clear();
             }
         }
     }

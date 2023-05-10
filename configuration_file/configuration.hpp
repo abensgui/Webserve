@@ -10,7 +10,7 @@
 
 struct location
 {
-    std::string path_location, root, auto_upload, upload_path, auto_index, redirection;
+    std::string path_location, root, auto_upload, upload_path, auto_index, redirection, cgi_path;
     std::deque<std::string> allow_methods;
     std::deque<std::string> index;
 };

@@ -29,6 +29,7 @@ clients_info &clients_info::operator=(const clients_info &obj)
     clear_client = obj.clear_client;
     post_finished = obj.post_finished;
     removed = obj.removed;
+    is_chunk = obj.is_chunk;
     //declare from Response
     header = obj.header;
     flag_header = obj.flag_header;
@@ -74,6 +75,7 @@ int SocketServer::get_client()
     clients[index_client].clear_client = 0;
     clients[index_client].post_finished = 0;
     clients[index_client].removed = 0;
+    clients[index_client].is_chunk = 0;
     return (index_client);
 }
 
@@ -205,7 +207,8 @@ void SocketServer::run_server(std::deque<server> &servers)
         ServerAddr.ai_socktype = SOCK_STREAM;
         ServerAddr.ai_flags = AI_PASSIVE;
         struct addrinfo *bindi;
-        getaddrinfo(servers[i].host.c_str(), servers[i].port.c_str(), &ServerAddr, &bindi);
+        int add = getaddrinfo(servers[i].host.c_str(), servers[i].port.c_str(), &ServerAddr, &bindi);
+        std::cout << "Add : " << add << "\n";
         servers[i].socket_id = socket(bindi->ai_family, bindi->ai_socktype, bindi->ai_protocol);
         if (servers[i].socket_id < 0)
             exit(1);

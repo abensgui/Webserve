@@ -49,6 +49,8 @@ class  clients_info
         bool        clear_client;
         int         post_finished;
         int         removed;
+        int         is_chunk;
+        int         len_chunk;
 
 };
 

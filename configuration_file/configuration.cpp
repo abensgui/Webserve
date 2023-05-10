@@ -102,6 +102,8 @@ int     confi::setup_configuration(std::string file)
                                 lc.auto_index = value_local;
                             else if (!key_local.compare("return") && strm_local.eof() && !value_local.empty())
                                 lc.redirection = value_local;
+                            else if (!key_local.compare("cgi_path") && strm_local.eof() && !value_local.empty())
+                                lc.cgi_path = value_local;
                             else
                             {
                                 std::cerr << "You must Follow Our Rules in Location" << std::endl;
