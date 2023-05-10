@@ -25,7 +25,7 @@ void statut_code(clients_info &client, std::map<std::string, std::string> err_pa
 
 void ft_send(clients_info &client)
 {
-	std::cout << "dsfds   "<< client.post_finished << std::endl;
+	// std::cout << "dsfds   "<< client.post_finished << std::endl;
 	if (client.post_finished)
 	{
 		std::cout << "here\n";

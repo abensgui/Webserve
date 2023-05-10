@@ -30,6 +30,7 @@ clients_info &clients_info::operator=(const clients_info &obj)
     post_finished = obj.post_finished;
     removed = obj.removed;
     is_chunk = obj.is_chunk;
+    exit_status = obj.exit_status;
     //declare from Response
     header = obj.header;
     flag_header = obj.flag_header;
@@ -175,6 +176,7 @@ void SocketServer::connection(std::deque<server> &srv)
                     if (clients[it_client].body.size() > srv[it_srv].mx_cl_bd_size)
                     {
                         // 413 Request Entity Too Large
+                        clients[it_client].exit_status = "413";
                     }
                 }
 

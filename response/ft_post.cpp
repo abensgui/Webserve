@@ -13,7 +13,8 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client, std::ma
 		{
 			timee = time(NULL);
 			file = delSp(itLoc->upload_path + "/" + std::to_string(timee) + get_extension(client.map_request["Content-Type"].c_str()));
-			client.fs.open(file , std::fstream::out | std::fstream::app);
+			if (!client.is_chunk)
+				client.fs.open(file , std::fstream::out | std::fstream::app);
 			if (!client.fs.is_open())
 				statut_code(client, err_pages, "500", "Internal Server Error");
 			client.flag_res = 0;

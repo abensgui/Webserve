@@ -14,9 +14,7 @@ void SocketServer::parse_header(int client)
 	getline(strm, walo, '\n');
 	pos = walo.find(":");
 	if (pos == -1)
-	{
 		clients[client].host = walo;
-	}
 	else
 	{
 		clients[client].host = walo.substr(0, pos);
@@ -37,23 +35,34 @@ void SocketServer::parse_header(int client)
 		if (!key.compare("Content-Length"))
 			clients[client].content_len = atol(value.c_str());
 	}
+	if (clients[client].map_request["Transfer-Encoding"] == "chunked")
+        clients[client].is_chunk = 1;
 
 	if (clients[client].method == "POST")
 	{
 		clients[client].is_post = 1;
-		if (clients[client].map_request.find("Transfer-Encoding") == clients[client].map_request.end())
+		if (clients[client].map_request["Transfer-Encoding"] != "chunked")
 		{
 			// 501 Not implemented
+			clients[client].exit_status = "501";
 		}
 		if (clients[client].map_request.find("Content-Length") == clients[client].map_request.end() &&
 			clients[client].map_request.find("Transfer-Encoding") == clients[client].map_request.end())
 		{
 			// 400 Bad request
+			clients[client].exit_status = "400";
 		}
-		if (clients[client].path.size() > 2048)
-		{
-			// 414 Request -URI Too Long
-		}
+	}
+	if (clients[client].path.size() > 2048)
+	{
+		// 414 Request -URI Too Long
+		clients[client].exit_status = "414";
+	}
+	int per = clients[client].path.find("%");
+	if (per != -1)
+	{
+		// 400 Bad request
+		clients[client].exit_status = "400";
 	}
 }
 
@@ -68,9 +77,11 @@ void SocketServer::parse_request(int it_client)
 	}
 	else
 	{
+		int pos_chunk = 0;
 		if (clients[it_client].end_header_req == 0)
 		{
 			clients[it_client].body.append(clients[it_client].request, len_recived);
+			pos_chunk = clients[it_client].body.find("\r\n0\r\n");
 			int pol = clients[it_client].body.find("\r\n\r\n");
 			if (pol != -1)
 			{
@@ -79,20 +90,18 @@ void SocketServer::parse_request(int it_client)
 					clients[it_client].body = clients[it_client].body.substr(pol + 4);
 				clients[it_client].flag_res = 1;
 				clients[it_client].end_header_req = 1;
-				if (clients[it_client].body.size() >= clients[it_client].content_len)
+				if (clients[it_client].body.size() == clients[it_client].content_len || (clients[it_client].is_chunk && pos_chunk != -1))
 					clients[it_client].post_finished = 1;
 			}
 		}
 		else if (clients[it_client].is_post == 1)
 		{
 			clients[it_client].body.append(clients[it_client].request, len_recived);
-			std::cout << "BODY : " << clients[it_client].body << "\n";
-			if (clients[it_client].body.size() >= clients[it_client].content_len)
+			pos_chunk = clients[it_client].body.find("\r\n0\r\n");
+			if (clients[it_client].body.size() == clients[it_client].content_len || (clients[it_client].is_chunk && pos_chunk != -1))
 				clients[it_client].post_finished = 1;
 		}
 	}
 	if (len_recived < MAX_SIZE)
-	{
 		clients[it_client].flag_res = 1;
-	}
 }

@@ -12,7 +12,7 @@
 #include <cstdio>
 #include "../configuration_file/configuration.hpp"
 
-#define MAX_SIZE 10000
+#define MAX_SIZE 10
 
 class  clients_info
 {
@@ -50,7 +50,7 @@ class  clients_info
         int         post_finished;
         int         removed;
         int         is_chunk;
-        int         len_chunk;
+        std::string exit_status;
         //error
         std::map<std::string, std::string> err_client;
 
