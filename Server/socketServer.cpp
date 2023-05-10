@@ -180,8 +180,9 @@ void SocketServer::connection(std::deque<server> &srv)
 
                 if (clients[it_client].flag_res == 1)
                 {
-
-                    ft_Response(srv, clients[it_client]);
+                    if(clients[it_client].flag_header == 0)    
+                        ft_Response(srv, clients[it_client]);
+                    ft_send(clients[it_client]);
                 }
 
                 if (clients[it_client].clear_client == true && clients[it_client].removed == 0)

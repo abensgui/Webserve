@@ -51,6 +51,8 @@ std::string get_extension(const char *path)
 		return ".html";
 	if (strcmp(path, "text/html") == 0)
 		return ".html";
+	if (strcmp(path, "text/php") == 0)
+		return ".php";
 	if (strcmp(path, "image/ico") == 0)
 		return ".x-icon";
 	if (strcmp(path, "image/jpeg") == 0)

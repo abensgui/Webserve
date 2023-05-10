@@ -51,6 +51,8 @@ class  clients_info
         int         removed;
         int         is_chunk;
         int         len_chunk;
+        //error
+        std::map<std::string, std::string> err_client;
 
 };
 

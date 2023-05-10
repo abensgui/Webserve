@@ -14,10 +14,10 @@ void listDir(clients_info &client, std::string file, std::deque<location>::itera
 		while ((ent = readdir(dir)) != NULL)
 		{
 			output.append("<li><a href=\"");
-			if(itLoc->path_location ==  "/")
+			if (itLoc->path_location == "/")
 				output.append(client.path + ent->d_name);
 			else
-				output.append(client.path+ "/" + ent->d_name);
+				output.append(client.path + "/" + ent->d_name);
 			output.append("\">");
 			output.append(ent->d_name);
 			output.append("</a></li>");
@@ -126,39 +126,31 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 	itSrv = select_server(Srv, client);
 	if (itSrv == Srv.end())
 		itSrv = Srv.begin();
+	client.err_client = itSrv->err_pages;
 	itLoc = location_match(itSrv->locations, client.path);
-
 	if (itLoc == itSrv->locations.end())
 	{
-
-		err_404(client, itSrv->err_pages);
+		statut_code(client, itSrv->err_pages, "404", "404 Not Found");
 	}
 	else
 	{
 		if (methodAllow(client.method, itLoc->allow_methods))
 		{
+			if (!itLoc->redirection.empty())
+			{
+				client.flagRed = true;
+				ft_redi(itLoc->redirection, client);
+			}
 			if (client.method == "GET")
 				ft_get(itLoc, client, itSrv->err_pages);
 			else if (client.method == "POST")
-			{
-
 				ft_post(itLoc, client, itSrv->err_pages);
-			}
 			else if (client.method == "DELETE")
-			{
-				std::cout << "DELETE\n";
-				std::cout << client.filename_post << "|\n";
 				ft_delete(itLoc, client, itSrv->err_pages);
-			}
 		}
 		else
 		{
-			err_405(client, itSrv->err_pages);
+			statut_code(client, itSrv->err_pages, "405", "Method Not Allowed");
 		}
-	}
-	if (client.file.eof() || client.flagRed == true)
-	{
-		std::cout << "client jfille eof \n";
-		client.clear_client = true;
 	}
 }
