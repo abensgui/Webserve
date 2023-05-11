@@ -7,6 +7,7 @@
 #include <deque>
 #include <map>
 #include <string>
+#include <cstring>
 
 struct location
 {

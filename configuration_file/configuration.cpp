@@ -20,6 +20,42 @@ void    confi::split_string(std::string &str, location &lc, char c)
     }
 }
 
+void     parse_host(std::string host)
+{
+    char *n;
+    int i = 0;
+    int j = 0;
+    int num;
+
+    n = strtok(const_cast<char *>(host.c_str()), ".");
+    while (n != NULL)
+    {
+        j = 0;
+        while (n[j])
+        {
+            if (!isdigit(n[j]))
+            {
+                std::cout << "This is Not a Number\n";
+                exit(1);
+            }
+            j++;
+        }
+        num = atoi(n);
+        if (num < 0 || num > 255)
+        {
+            std::cout << "Out of Range\n";
+            exit(1);
+        }
+        n = strtok(NULL, ".");
+        i++;
+    }
+    if (i != 4)
+    {
+        std::cout << "Error: This is Not IPv4\n";
+        exit(1);
+    }
+}
+
 int     confi::setup_configuration(std::string file)
 {
     std::fstream congi_file;
@@ -126,7 +162,10 @@ int     confi::setup_configuration(std::string file)
                         break;
                     }
                     else if (!key.compare("host") && strm.eof() && !value.empty())
+                    {
+                        parse_host(value);
                         sr.host = value;
+                    }
                     else if (!key.compare("port") && strm.eof() && !value.empty())
                         sr.port = value;
                     else if (!key.compare("max_client_body_size") && strm.eof() && !value.empty())
