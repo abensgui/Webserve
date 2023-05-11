@@ -20,6 +20,23 @@ void    confi::split_string(std::string &str, location &lc, char c)
     }
 }
 
+int      check_is_digit(char *n)
+{
+    int i = 0;
+    int num;
+    while (n[i])
+    {
+        if (!isdigit(n[i]))
+        {
+            std::cout << "This is Not a Number\n";
+            exit(1);
+        }
+        i++;
+    }
+    num = atoi(n);
+    return (num);
+}
+
 void     parse_host(std::string host)
 {
     char *n;
@@ -31,16 +48,7 @@ void     parse_host(std::string host)
     while (n != NULL)
     {
         j = 0;
-        while (n[j])
-        {
-            if (!isdigit(n[j]))
-            {
-                std::cout << "This is Not a Number\n";
-                exit(1);
-            }
-            j++;
-        }
-        num = atoi(n);
+        num = check_is_digit(n);
         if (num < 0 || num > 255)
         {
             std::cout << "Out of Range\n";
@@ -167,7 +175,16 @@ int     confi::setup_configuration(std::string file)
                         sr.host = value;
                     }
                     else if (!key.compare("port") && strm.eof() && !value.empty())
+                    {
+                        int num_port;
+                        num_port = check_is_digit(const_cast<char *>(value.c_str()));
+                        if (num_port < 0 || num_port > 65535)
+                        {
+                            std::cout << "Error in Port\n";
+                            exit(1);
+                        }
                         sr.port = value;
+                    }
                     else if (!key.compare("max_client_body_size") && strm.eof() && !value.empty())
                         sr.mx_cl_bd_size = std::atoi(value.c_str());
                     else if (!key.compare("server_name"))

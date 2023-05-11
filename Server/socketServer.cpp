@@ -210,10 +210,8 @@ void SocketServer::run_server(std::deque<server> &servers)
         ServerAddr.ai_socktype = SOCK_STREAM;
         ServerAddr.ai_flags = AI_PASSIVE;
         struct addrinfo *bindi;
-        int add = getaddrinfo(servers[i].host.c_str(), servers[i].port.c_str(), &ServerAddr, &bindi);
-        std::cout << "Add : " << add << "\n";
+        getaddrinfo(servers[i].host.c_str(), servers[i].port.c_str(), &ServerAddr, &bindi);
         servers[i].socket_id = socket(bindi->ai_family, bindi->ai_socktype, bindi->ai_protocol);
-        std::cout << "here\n";
         if (servers[i].socket_id < 0)
             exit(1);
         std::cout << "Creating socket... " << servers[i].socket_id << std::endl;
