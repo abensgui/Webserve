@@ -16,10 +16,7 @@ std::deque<std::string> get_env(clients_info &client, std::string file)
 
 void exec_cgi(clients_info &client, std::string file, std::map<std::string, std::string> err_pages)
 {
-	std::ofstream file11("trach/chech_output_cgi.txt");
 
-	file11 << "inside CGI\n" << std::endl;
-	std::cout << "test = " << client.flag_header << std::endl;
 	if (client.flag_header == 0)
 	{
 		(void)err_pages;
@@ -55,6 +52,7 @@ void exec_cgi(clients_info &client, std::string file, std::map<std::string, std:
 				else
 				{
 					fd = open(client.post_file.c_str(), O_RDONLY);
+					std::cout <<"post_file :: " << client.post_file << std::endl;
 					fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR, 0777);
 				}
 				dup2(fd, 0);

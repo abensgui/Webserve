@@ -12,7 +12,7 @@
 #include <cstdio>
 #include "../configuration_file/configuration.hpp"
 
-#define MAX_SIZE 10
+#define MAX_SIZE 10000
 
 class  clients_info
 {

@@ -35,11 +35,11 @@ clients_info &clients_info::operator=(const clients_info &obj)
     header = obj.header;
     flag_header = obj.flag_header;
     flagRed = obj.flagRed;
-
     // t2eked mnha ba9i f l path
     fs.open(path, std::fstream::out | std::fstream::app);
     fs << obj.file.rdbuf();
     // end
+
     err_client = obj.err_client;
     post_file = obj.post_file;
     itLoc = obj.itLoc;
@@ -49,6 +49,7 @@ clients_info &clients_info::operator=(const clients_info &obj)
     flag_ff = obj.flag_ff;
     send_hed = obj.send_hed;
     exe_cgi = obj.exe_cgi;
+
     return *this;
 }
 
@@ -178,6 +179,7 @@ void SocketServer::connection(std::deque<server> &srv)
             it_srv++;
         }
         it_client = 0;
+        
         while (it_client < clients.size())
         {
             if (FD_ISSET(clients[it_client].socket_client_id, &writer))
@@ -188,7 +190,6 @@ void SocketServer::connection(std::deque<server> &srv)
                     if (clients[it_client].body.size() > srv[it_srv].mx_cl_bd_size)
                     {
                         // 413 Request Entity Too Large
-                        clients[it_client].exit_status = "413";
                     }
                 }
 
@@ -198,9 +199,11 @@ void SocketServer::connection(std::deque<server> &srv)
                         ft_Response(srv, clients[it_client]);
                     ft_send(clients[it_client]);
                 }
+                
 
                 if (clients[it_client].clear_client == true && clients[it_client].removed == 0)
                 {
+                    
                     clients[it_client].file.close();
                     remove_client(clients[it_client].socket_client_id);
                     clients[it_client].flagRed = false;
@@ -222,7 +225,8 @@ void SocketServer::run_server(std::deque<server> &servers)
         ServerAddr.ai_socktype = SOCK_STREAM;
         ServerAddr.ai_flags = AI_PASSIVE;
         struct addrinfo *bindi;
-        getaddrinfo(servers[i].host.c_str(), servers[i].port.c_str(), &ServerAddr, &bindi);
+        int add = getaddrinfo(servers[i].host.c_str(), servers[i].port.c_str(), &ServerAddr, &bindi);
+        std::cout << "Add : " << add << "\n";
         servers[i].socket_id = socket(bindi->ai_family, bindi->ai_socktype, bindi->ai_protocol);
         if (servers[i].socket_id < 0)
             exit(1);
