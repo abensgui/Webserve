@@ -10,7 +10,7 @@ clients_info::clients_info(const clients_info &obj)
 
 clients_info &clients_info::operator=(const clients_info &obj)
 {
-    //declare from Request
+    // declare from Request
     addr_len = obj.addr_len;
     address = obj.address;
     socket_client_id = obj.socket_client_id;
@@ -31,15 +31,24 @@ clients_info &clients_info::operator=(const clients_info &obj)
     removed = obj.removed;
     is_chunk = obj.is_chunk;
     exit_status = obj.exit_status;
-    //declare from Response
+    // declare from Response
     header = obj.header;
     flag_header = obj.flag_header;
     flagRed = obj.flagRed;
-    //t2eked mnha ba9i f l path
+
+    // t2eked mnha ba9i f l path
     fs.open(path, std::fstream::out | std::fstream::app);
     fs << obj.file.rdbuf();
-    //end
-
+    // end
+    err_client = obj.err_client;
+    post_file = obj.post_file;
+    itLoc = obj.itLoc;
+    itSrv = obj.itSrv;
+    pid = obj.pid;
+    file_aa = obj.file_aa;
+    flag_ff = obj.flag_ff;
+    send_hed = obj.send_hed;
+    exe_cgi = obj.exe_cgi;
     return *this;
 }
 
@@ -77,6 +86,9 @@ int SocketServer::get_client()
     clients[index_client].post_finished = 0;
     clients[index_client].removed = 0;
     clients[index_client].is_chunk = 0;
+    clients[index_client].flag_ff = 0;
+    clients[index_client].send_hed = 0;
+    clients[index_client].exe_cgi = 0;
     return (index_client);
 }
 
@@ -182,7 +194,7 @@ void SocketServer::connection(std::deque<server> &srv)
 
                 if (clients[it_client].flag_res == 1)
                 {
-                    if(clients[it_client].flag_header == 0)    
+                    if (clients[it_client].flag_header == 0)
                         ft_Response(srv, clients[it_client]);
                     ft_send(clients[it_client]);
                 }

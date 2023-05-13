@@ -53,6 +53,14 @@ class  clients_info
         std::string exit_status;
         //error
         std::map<std::string, std::string> err_client;
+        std::string post_file;
+        std::deque<location>::iterator itLoc;
+        std::deque<server>::iterator itSrv;
+        pid_t pid;
+        std::string file_aa;
+        bool flag_ff;
+        bool send_hed;
+        bool exe_cgi;
 
 };
 

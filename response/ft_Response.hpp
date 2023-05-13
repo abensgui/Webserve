@@ -12,14 +12,16 @@
 #include <ctime>
 #include <sys/types.h> 
 #include <unistd.h> 
-   #include <fcntl.h>
-   #include <stdlib.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <signal.h>
 
 void ft_Response(std::deque<server> &Srv, clients_info &client);
 void ft_send(clients_info &client);
 
 std::string get_content_type(const char *path);
 std::string get_extension(const char *path);
+std::deque<std::string> get_env(clients_info &client);
 
 void statut_code(clients_info &client, std::map<std::string, std::string> err_pages, std::string err, std::string statut);
 void ok_200(clients_info &client, std::string file, std::map<std::string, std::string> err_pages);
@@ -35,6 +37,9 @@ void ft_redi(std::string redi, clients_info &client);
 void listDir(clients_info &client, std::string file);
 
 std::string delSp(std::string file);
+
+
+void exec_cgi(clients_info &client,std::string file, std::map<std::string, std::string> err_pages);
 
 
 #endif /* ***************************************************** GETRESPONSE_H */

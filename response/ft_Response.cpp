@@ -126,8 +126,10 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 	itSrv = select_server(Srv, client);
 	if (itSrv == Srv.end())
 		itSrv = Srv.begin();
+	client.itSrv = itSrv;
 	client.err_client = itSrv->err_pages;
 	itLoc = location_match(itSrv->locations, client.path);
+	client.itLoc = itLoc;
 	if (itLoc == itSrv->locations.end())
 	{
 		statut_code(client, itSrv->err_pages, "404", "404 Not Found");
@@ -141,7 +143,7 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 				client.flagRed = true;
 				ft_redi(itLoc->redirection, client);
 			}
-			if (client.method == "GET")
+			else if (client.method == "GET")
 				ft_get(itLoc, client, itSrv->err_pages);
 			else if (client.method == "POST")
 				ft_post(itLoc, client, itSrv->err_pages);

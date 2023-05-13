@@ -14,6 +14,7 @@ SRC =	Request/request.cpp\
 		response/ft_get.cpp\
 		response/ft_post.cpp\
 		response/ft_delete.cpp\
+		response/exec_cgi.cpp\
 
 all : $(NAME)
 $(NAME) : $(SRC)

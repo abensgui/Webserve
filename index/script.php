@@ -1,39 +1,31 @@
-
 <?php
+// Check if form was submitted
+if(isset($_POST["submit"])) {
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-$target_dir = "../../upload/upload";
-$target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
-$uploadOk = 1;
-$fileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
-
-// Check if file already exists
-if (file_exists($target_file)) {
-  echo "Sorry, file already exists.";
-  $uploadOk = 0;
-}
-
-// Allow certain file formats
-$allowedTypes = array("php", "html", "js", "css", "txt", "pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx", "jpg", "jpeg", "png", "gif", "mp3", "wav", "mp4", "avi", "mov", "wmv", "flv");
-if (!in_array($fileType, $allowedTypes)) {
-  echo "Sorry, only PHP, HTML, JavaScript, CSS, TXT, PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, JPG, JPEG, PNG, GIF, MP3, WAV, MP4, AVI, MOV, WMV, and FLV files are allowed.";
-  $uploadOk = 0;
-}
-
-// Check if $uploadOk is set to 0 by an error
-if ($uploadOk == 0) {
-  echo "Sorry, your file was not uploaded.";
-// if everything is ok, try to upload file
-} else {
-  if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-    echo "The file ". htmlspecialchars( basename( $_FILES["fileToUpload"]["name"])). " has been uploaded.";
+  // Check if file was uploaded without errors
+  if(isset($_FILES["fileToUpload"]) && $_FILES["fileToUpload"]["error"] == 0) {
+    $target_dir = "/Users/abensgui/Desktop/Webserve/sup/";
+    $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
+    $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+    
+    // Allow certain file formats
+    $allowed_types = array('jpg', 'jpeg', 'png', 'gif');
+    if(in_array($imageFileType, $allowed_types)) {
+      // Attempt to move the uploaded file to its new location
+      if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+        echo "The file ". htmlspecialchars( basename( $_FILES["fileToUpload"]["name"])). " has been uploaded.";
+      } else {
+        echo "Sorry, there was an error uploading your file.";
+      }
+    } else {
+      echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+    }
   } else {
     echo "Sorry, there was an error uploading your file.";
   }
 }
-
-
-
+else
+{
+  echo "Sorry, ayoub";
+}
 ?>
