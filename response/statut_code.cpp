@@ -1,4 +1,19 @@
 #include "ft_Response.hpp"
+size_t get_len(clients_info &client)
+{
+	std::string ss;
+	char buf[1000];
+	
+	while (1) {
+		bzero(buf, 100);
+		client.file.read(buf, 100);
+		if(!strlen(buf))
+			break;
+		ss.append(buf);
+	}
+	client.file.seekg(0, std::ios::beg);
+	return(ss.length() - ss.find("\r\n\r\n") - 4);
+}
 
 void statut_code(clients_info &client, std::map<std::string, std::string> err_pages, std::string err, std::string statut)
 {
@@ -10,15 +25,18 @@ void statut_code(clients_info &client, std::map<std::string, std::string> err_pa
 		client.file.seekg(0, std::ios::beg);
 		if (!client.file.is_open())
 		{
-			statut_code(client, err_pages, "403", "403 Forbidden");
+			default_err(client, statut);
 		}
-		client.header = "HTTP/1.1 " + statut +
-						"\r\nConnection: close\r\n"
-						"Content-Type: text/html\r\n"
-						"Content-Length: " +
-						std::to_string(client.size) + "\r\n\r\n";
+		else
+		{
+			client.header = "HTTP/1.1 " + statut +
+							"\r\nConnection: close\r\n"
+							"Content-Type: text/html\r\n"
+							"Content-Length: " +
+							std::to_string(client.size) + "\r\n\r\n";
 
-		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
+			send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
+		}
 		client.flag_header = 1;
 		client.send_hed = 1;
 	}
@@ -72,6 +90,7 @@ void ft_send(clients_info &client)
 			client.flagRed = true;
 		}
 	}
+	
 	if (waitpid(client.pid, 0, WNOHANG) != 0 && !client.itLoc->cgi_path.empty() && client.send_hed == 0)
 	{
 		client.file.open(client.file_aa, std::ios::in);
@@ -79,7 +98,14 @@ void ft_send(clients_info &client)
 		{
 			statut_code(client, client.err_client, "403", "413 Forbidden");
 		}
-		client.header = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n";
+		client.header = "HTTP/1.1 200 OK\r\n"
+						"Connection: close\r\n"
+						"Content-Type: text/html\r\n"
+						"Content-Length: " +
+						std::to_string(get_len(client)) + "\r\n";
+		client.file.close();
+		client.file.open(client.file_aa, std::ios::in);
+		client.send_hed = 1;
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
 		client.flag_ff = 1;
 	}

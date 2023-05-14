@@ -1,0 +1,5 @@
+X-Powered-By: PHP/8.0.2
+Set-Cookie: name=aaaaa%3B%20session%3Daaaaa
+Content-type: text/html; charset=UTF-8
+
+<html><head><title>Greetings</title></head><body><h1>Name, aaaaa; session=aaaaa!</h1></body></html>

@@ -23,6 +23,9 @@ std::string get_content_type(const char *path);
 std::string get_extension(const char *path);
 std::deque<std::string> get_env(clients_info &client);
 
+
+void default_err(clients_info &client, std::string status);
+
 void statut_code(clients_info &client, std::map<std::string, std::string> err_pages, std::string err, std::string statut);
 void ok_200(clients_info &client, std::string file, std::map<std::string, std::string> err_pages);
 void ft_get(std::deque<location>::iterator itLoc, clients_info &client, std::map<std::string, std::string> err_pages);

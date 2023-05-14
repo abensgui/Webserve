@@ -1,68 +1,44 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    
-    // save $_FILES['avatar'] to a inside a folder
-    $avatar = $_FILES['avatar'];
-    $avatar_name = $avatar['name'];
-    $avatar_tmp_name = $avatar['tmp_name'];
-    $avatar_size = $avatar['size'];
-    $avatar_error = $avatar['error'];
+// $name = "none";
+$name = NULL;
+$session = NULL;
+// get the value of the "name" parameter
+if (isset($_GET["name"]))
+    $name = $_GET["name"];
+else if (isset($_COOKIE["name"]))
+    $name = $_COOKIE["name"];
 
-    $avatar_ext = explode('.', $avatar_name);
-    $avatar_actual_ext = strtolower(end($avatar_ext));
+if (isset($_GET["session"]))
+    $session = $_GET["session"];
+else 
+if (isset($_COOKIE["session"]))
+    $session = $_COOKIE["session"];
+// create a new cookie
+if ($name)
+    setcookie("name", $name);
+if ($session)
+    setcookie("session", $session);
 
-    $allowed = array('jpg', 'jpeg', 'png');
+// set the Content-Type header to indicate that the response will be in HTML format
+// header("Content-Type: text/html");
 
-    if (in_array($avatar_actual_ext, $allowed)) {
-        if ($avatar_error === 0) {
-            if ($avatar_size < 1000000) {
-                $avatar_name_new = uniqid('', true) . '.' . $avatar_actual_ext;
-                $avatar_destination = 'sup/' . $avatar_name_new;
-                move_uploaded_file($avatar_tmp_name, $avatar_destination);
-                $_COOKIE['name'] = $_POST['name'];
-                $_COOKIE['email'] = $_POST['email'];
-                $_COOKIE['avatar'] = $avatar_destination;
-                setcookie('name', $_POST['name'], time() + 3600 * 24 * 7);
-                setcookie('email', $_POST['email'], time() + 3600 * 24 * 7);
-                setcookie('avatar', $avatar_destination, time() + 3600 * 24 * 7);
-            } else {
-                echo 'File too big';
-                exit(1);
-            }
-        } else {
-            echo 'Error';
-            exit(1);
-        }
-    } else {
-        echo 'Not allowed';
-        exit(1);
-    }
-} else if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['logout'])) {
-    unset($_COOKIE['name']);
-    unset($_COOKIE['email']);
-    unset($_COOKIE['avatar']);
-    setcookie('name', '', time() - 3600);
-    setcookie('email', '', time() - 3600);
-    setcookie('avatar', '', time() - 3600);
+// output the HTML code to create the web page
+echo "<html><head><title>Greetings</title></head><body>";
+if ($name || $session) {
+    if ($name) 
+        echo "<h1>Name, $name!</h1>";
+    if ($session) 
+        echo "<h1>Session, $session!</h1>";
+        echo "</body></html>";
+}
+else {
+    echo "<h1>Please enter your name.</h1>";
+    echo '<form method="GET" action="script2.php">';
+    echo 'Name: <input type="text" name="name">';
+    echo 'Session: <input type="text" name="session">';
+    echo '<input type="submit" value="Submit">';
+    echo '</form>';
+    echo "</body></html>";
 }
 
 ?>
-<!DOCTYPE html>
-<div>
-    <?php if (isset($_COOKIE['name']) && isset($_COOKIE['email'])): ?>
-        <p>
-            <center><h1>Hello, <?= $_COOKIE['name'] ?>!</h1></center><hr>
-            <center><img src="<?= $_COOKIE['avatar'] ?>" alt="avatar" width="300" height="300" style="object-fit: cover;"></center><hr><br/>
-            <center><?php echo $_COOKIE['name']; ?></center>
-            <center><?php echo $_COOKIE['email']; ?></center><br/><br/>
-            <center><a href="?logout">Logout</a></center>
-        </p>
-    <?php else: ?>
-        <form method="post" enctype="multipart/form-data">
-            <input type="text" name="name" placeholder="Name" />
-            <input type="text" name="email" placeholder="Email" />
-            <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" />
-            <input type="submit" value="Submit" />
-        </form>
-    <?php endif; ?>
-</div>

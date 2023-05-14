@@ -1,0 +1,14 @@
+-----------------------------48005017342424720342518795138
+Content-Disposition: form-data; name="name"
+
+1111
+-----------------------------48005017342424720342518795138
+Content-Disposition: form-data; name="email"
+
+111222
+-----------------------------48005017342424720342518795138
+Content-Disposition: form-data; name="avatar"; filename=""
+Content-Type: application/octet-stream
+
+
+-----------------------------48005017342424720342518795138--
