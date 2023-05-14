@@ -13,9 +13,23 @@ std::string delSp(std::string file)
 	return (file);
 }
 
+bool check_ext(std::string path)
+{
+	size_t p;
+	if(path.find("?"))
+		path = path.substr(0, path.find("?"));
+	p = path.find_last_of(".");
+	if(( p == path.length() - 4 &&  path.substr(p , 4) == ".php") || (p == path.length() - 3 &&  path.substr(p , 3) == ".py"))
+	{
+		return (true);
+	}
+	return (false);
+}
+
 void ft_get(std::deque<location>::iterator itLoc, clients_info &client, std::map<std::string, std::string> err_pages)
 {
 	std::string file;
+	std::string cookie;
 	file = client.path;
 	size_t i = 0;
 	if (itLoc->path_location != "/")
@@ -49,15 +63,13 @@ void ft_get(std::deque<location>::iterator itLoc, clients_info &client, std::map
 	else
 	{
 		std::ifstream file1(file);
-
-		if (file1.good())
+		if (!itLoc->cgi_path.empty() && check_ext(file))
 		{
-			if (!itLoc->cgi_path.empty())
-			{
-				std::cout << "-----cgi------------------------------------\n";
-				exec_cgi(client, file, err_pages);
-			}
-			else
+			std::cout << file << "---- cgi ---- \n";
+			exec_cgi(client, file, err_pages);
+		}
+		else if (file1.good())
+		{
 				ok_200(client, file, err_pages);
 		}
 		else statut_code(client, err_pages, "404", "404 Not Found");

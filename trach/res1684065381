@@ -1,0 +1,16 @@
+X-Powered-By: PHP/8.0.2
+Set-Cookie: name=11; expires=Sun, 21-May-2023 11:56:22 GMT; Max-Age=604800
+Set-Cookie: email=11; expires=Sun, 21-May-2023 11:56:22 GMT; Max-Age=604800
+Set-Cookie: avatar=sup%2F6460cc65b7d424.61616682.png; expires=Sun, 21-May-2023 11:56:22 GMT; Max-Age=604800
+Content-type: text/html; charset=UTF-8
+
+<!DOCTYPE html>
+<div>
+            <p>
+            <center><h1>Hello, 11!</h1></center><hr>
+            <center><img src="sup/6460cc65b7d424.61616682.png" alt="avatar" width="300" height="300" style="object-fit: cover;"></center><hr><br/>
+            <center>11</center>
+            <center>11</center><br/><br/>
+            <center><a href="?logout">Logout</a></center>
+        </p>
+    </div>

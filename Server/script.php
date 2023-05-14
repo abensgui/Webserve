@@ -4,7 +4,7 @@ if(isset($_POST["submit"])) {
 
   // Check if file was uploaded without errors
   if(isset($_FILES["fileToUpload"]) && $_FILES["fileToUpload"]["error"] == 0) {
-    $target_dir = "/Users/abensgui/Desktop/Webserve/sup/";
+    $target_dir = "../sup/";
     $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
     $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
     

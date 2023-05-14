@@ -1,0 +1,8 @@
+X-Powered-By: PHP/8.0.2
+Content-type: text/html; charset=UTF-8
+
+<br />
+<b>Warning</b>:  move_uploaded_file(sup/Screenshot_2023-04-04-22-06-46-463_com.linkedin.android-edit.jpg): Failed to open stream: No such file or directory in <b>/Users/abensgui/Desktop/webservvv/Server/script.php</b> on line <b>15</b><br />
+<br />
+<b>Warning</b>:  move_uploaded_file(): Unable to move &quot;/private/var/tmp/phprhGv68&quot; to &quot;sup/Screenshot_2023-04-04-22-06-46-463_com.linkedin.android-edit.jpg&quot; in <b>/Users/abensgui/Desktop/webservvv/Server/script.php</b> on line <b>15</b><br />
+Sorry, there was an error uploading your file.

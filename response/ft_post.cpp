@@ -12,14 +12,14 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client, std::ma
 	{	
 		std::cout << "inside code status 404 \n"; 
 		statut_code(client, err_pages, "404", "404 Not Found");
-		}
+	}
 	else if (itLoc->auto_upload == "on")
 	{
 		if (client.end_header_req == 1)
 		{
 			timee = time(NULL);
 			if(!itLoc->cgi_path.empty())
-				file = delSp("/tmp/upload_" + std::to_string(timee));  
+				file = delSp("upload/upload_" + std::to_string(timee));  
 			else
 			{
 				
@@ -29,7 +29,6 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client, std::ma
 			client.fs.open(file, std::fstream::out);
 			if (!client.fs.is_open())
 			{
-				std::cout << "file : |" << client.map_request["Content-Type"] << "|"<<std::endl;
 				statut_code(client, err_pages, "500", "Internal Server Error");
 			}
 			//client.flag_res = 0;

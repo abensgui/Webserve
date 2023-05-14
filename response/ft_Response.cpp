@@ -58,10 +58,18 @@ std::deque<server>::iterator select_server(std::deque<server> &Srv, clients_info
 
 	while (it != Srv.end())
 	{
-		if ((it->host == client.host || it->server_name == client.host) && it->port == client.port)
+		if ( it->server_name == client.host && it->port == client.port)
 			return (it);
 		it++;
 	}
+	it = Srv.begin();
+	while (it != Srv.end())
+	{
+		if (it->host == client.host  && it->port == client.port)
+			return (it);
+		it++;
+	}
+
 	return (it);
 }
 
@@ -86,7 +94,6 @@ std::deque<location>::iterator location_match(std::deque<location> &loc, std::st
 
 void ft_redi(std::string redi, clients_info &client)
 {
-	std::cout << "==========here" << std::endl;
 	client.header = "HTTP/1.1 301 Moved Permanently\r\n"
 					"Location: " +
 					redi + "\r\n\n\r";

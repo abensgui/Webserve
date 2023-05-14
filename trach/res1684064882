@@ -1,0 +1,16 @@
+X-Powered-By: PHP/8.0.2
+Set-Cookie: name=aaa; expires=Sun, 21-May-2023 11:48:02 GMT; Max-Age=604800
+Set-Cookie: email=ay%40asda; expires=Sun, 21-May-2023 11:48:02 GMT; Max-Age=604800
+Set-Cookie: avatar=..%2Fsup%2F6460ca72be9a12.97230459.jpg; expires=Sun, 21-May-2023 11:48:02 GMT; Max-Age=604800
+Content-type: text/html; charset=UTF-8
+
+<!DOCTYPE html>
+<div>
+            <p>
+            <center><h1>Hello, aaa!</h1></center><hr>
+            <center><img src="../sup/6460ca72be9a12.97230459.jpg" alt="avatar" width="300" height="300" style="object-fit: cover;"></center><hr><br/>
+            <center>aaa</center>
+            <center>ay@asda</center><br/><br/>
+            <center><a href="?logout">Logout</a></center>
+        </p>
+    </div>
