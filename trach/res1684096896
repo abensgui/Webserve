@@ -1,6 +1,0 @@
-X-Powered-By: PHP/8.0.2
-Set-Cookie: name=%20aa
-Set-Cookie: session=ss
-Content-type: text/html; charset=UTF-8
-
-<h1>Name,  aa!</h1><h1>Session, ss!</h1><html><head><title>Greetings</title></head><body><h1>Name,  aa!</h1><h1>Session, ss!</h1></body></html><h1>Please enter your name.</h1><form method="GET" action="script2.php">Name: <input type="text" name="name">Session: <input type="text" name="session"><input type="submit" value="Submit"></form></body></html>

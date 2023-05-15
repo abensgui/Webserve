@@ -34,35 +34,40 @@ void SocketServer::parse_header(int client)
 			break;
 		if (!key.compare("Content-Length"))
 			clients[client].content_len = atol(value.c_str());
-	}
-	if (clients[client].map_request["Transfer-Encoding"] == "chunked")
-        clients[client].is_chunk = 1;
+		if (!key.compare("Transfer-Encoding") && !value.compare("chunked"))
+			clients[client].is_chunk = 1;
 
+	}
 	if (clients[client].method == "POST")
 	{
 		clients[client].is_post = 1;
 		if (clients[client].map_request["Transfer-Encoding"] != "chunked")
 		{
+			std::cout << "hereeeeeeeeeee\n"
 			// 501 Not implemented
-			clients[client].exit_status = "501";
+			clients[client].exit_status.first = "501";
+			clients[client].exit_status.second = "501 Not Implemented";
 		}
 		if (clients[client].map_request.find("Content-Length") == clients[client].map_request.end() &&
 			clients[client].map_request.find("Transfer-Encoding") == clients[client].map_request.end())
 		{
 			// 400 Bad request
-			clients[client].exit_status = "400";
+			clients[client].exit_status.first = "400";
+			clients[client].exit_status.second = "400 Bad Request";
 		}
 	}
 	if (clients[client].path.size() > 2048)
 	{
 		// 414 Request -URI Too Long
-		clients[client].exit_status = "414";
+		clients[client].exit_status.first = "414";
+			clients[client].exit_status.second = "414 URI Too Long";
 	}
 	int per = clients[client].path.find("%");
 	if (per != -1)
 	{
 		// 400 Bad request
-		clients[client].exit_status = "400";
+		clients[client].exit_status.first = "400";
+		clients[client].exit_status.second = "400 Bad Request";
 	}
 }
 

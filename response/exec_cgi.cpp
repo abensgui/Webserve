@@ -57,13 +57,13 @@ void exec_cgi(clients_info &client, std::string file, std::map<std::string, std:
 			if (client.method == "GET")
 			{
 				fd = open(file.c_str(), O_RDONLY);
-				fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR, 0777);
+				fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
 			}
 			else
 			{
 
 				fd = open(client.post_file.c_str(), O_RDONLY);
-				fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR, 0777);
+				fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
 			}
 			dup2(fd, 0);
 			dup2(fd1, 1);

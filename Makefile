@@ -16,6 +16,7 @@ SRC =	Request/request.cpp\
 		response/ft_delete.cpp\
 		response/exec_cgi.cpp\
 		response/default_err.cpp\
+		response/listDir.cpp\
 
 all : $(NAME)
 $(NAME) : $(SRC)

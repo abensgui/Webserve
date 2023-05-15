@@ -50,7 +50,7 @@ class  clients_info
         int         post_finished;
         int         removed;
         int         is_chunk;
-        std::string exit_status;
+        std::pair<std::string, std::string> exit_status;
         //error
         std::map<std::string, std::string> err_client;
         std::string post_file;

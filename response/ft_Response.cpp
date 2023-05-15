@@ -1,46 +1,6 @@
 #include "ft_Response.hpp"
 #include <fstream>
 #include <string>
-
-void listDir(clients_info &client, std::string file, std::deque<location>::iterator itLoc)
-{
-	std::string output;
-	output.append("<html><body><ul>");
-
-	DIR *dir;
-	struct dirent *ent;
-	if ((dir = opendir(file.c_str())) != NULL)
-	{
-		while ((ent = readdir(dir)) != NULL)
-		{
-			output.append("<li><a href=\"");
-			if (itLoc->path_location == "/")
-				output.append(client.path + ent->d_name);
-			else
-				output.append(client.path + "/" + ent->d_name);
-			output.append("\">");
-			output.append(ent->d_name);
-			output.append("</a></li>");
-		}
-		closedir(dir);
-	}
-	else
-	{
-		perror("Unable to open directory");
-	}
-	output.append("</ul></body></html>");
-	client.header = "HTTP/1.1 200 OK\r\n"
-					"Connection: close\r\n"
-					"Content-Type: "
-					"text/html\r\n"
-					"Content-Length: " +
-					std::to_string(output.size()) +
-					"\r\n\r\n";
-	send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
-	send(client.socket_client_id, output.c_str(), output.length(), 0);
-	client.flagRed = true;
-}
-
 std::string newpath(std::string path)
 {
 	size_t pos = -1;
@@ -143,23 +103,30 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 	}
 	else
 	{
-		if (methodAllow(client.method, itLoc->allow_methods))
+		if(!client.exit_status.first.empty())
 		{
-			if (!itLoc->redirection.empty())
-			{
-				client.flagRed = true;
-				ft_redi(itLoc->redirection, client);
-			}
-			else if (client.method == "GET")
-				ft_get(itLoc, client, itSrv->err_pages);
-			else if (client.method == "POST")
-				ft_post(itLoc, client, itSrv->err_pages);
-			else if (client.method == "DELETE")
-				ft_delete(itLoc, client, itSrv->err_pages);
+			statut_code(client, itSrv->err_pages, client.exit_status.first, client.exit_status.second);
 		}
 		else
 		{
-			statut_code(client, itSrv->err_pages, "405", "Method Not Allowed");
+			if (methodAllow(client.method, itLoc->allow_methods))
+			{
+				if (!itLoc->redirection.empty())
+				{
+					client.flagRed = true;
+					ft_redi(itLoc->redirection, client);
+				}
+				else if (client.method == "GET")
+					ft_get(itLoc, client, itSrv->err_pages);
+				else if (client.method == "POST")
+					ft_post(itLoc, client, itSrv->err_pages);
+				else if (client.method == "DELETE")
+					ft_delete(itLoc, client, itSrv->err_pages);
+			}
+			else
+			{
+				statut_code(client, itSrv->err_pages, "405", "Method Not Allowed");
+			}
 		}
 	}
 }

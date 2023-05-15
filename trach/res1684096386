@@ -1,6 +1,0 @@
-X-Powered-By: PHP/8.0.2
-Set-Cookie: name=qqq
-Set-Cookie: session=qq
-Content-type: text/html; charset=UTF-8
-
-<html><head><title>Greetings</title></head><body><h1>Name, qqq!</h1><h1>Session, qq!</h1></body></html>

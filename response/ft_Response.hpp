@@ -44,5 +44,7 @@ std::string delSp(std::string file);
 
 void exec_cgi(clients_info &client,std::string file, std::map<std::string, std::string> err_pages);
 
+void listDir(clients_info &client, std::string file, std::deque<location>::iterator itLoc);
+
 
 #endif /* ***************************************************** GETRESPONSE_H */

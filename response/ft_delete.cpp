@@ -3,12 +3,13 @@
 void ft_delete(std::deque<location>::iterator itLoc, clients_info &client, std::map<std::string, std::string> err_pages)
 {
 	std::string file;
-
+	file = client.path;
 	if (itLoc->path_location != "/")
 		file.replace(0, itLoc->path_location.length(), itLoc->root);
 	else
 		file.replace(0, itLoc->path_location.length() - 1, itLoc->root);
 	file = delSp(file);
+	std::cout<< "----------   " << file << std::endl;
 	if (is_fileOrDir(client.path))
 		statut_code(client, err_pages, "403", "403 Forbidden");
 	else
