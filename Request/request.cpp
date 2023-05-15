@@ -38,29 +38,33 @@ void SocketServer::parse_header(int client)
 			clients[client].is_chunk = 1;
 
 	}
+	if (clients[client].method == "POST")
+		clients[client].is_post = 1;
 	int per = clients[client].path.find("%");
 	if (clients[client].method == "POST" && \
 		clients[client].map_request.find("Transfer-Encoding") != clients[client].map_request.end() && \
 		clients[client].map_request["Transfer-Encoding"] != "chunked")
 	{
-		clients[client].is_post = 1;
+		clients[client].flag_res = 1;
 		clients[client].exit_status.first = "501";
 		clients[client].exit_status.second = "501 Not Implemented";
 	}
 	else if (clients[client].method == "POST" && clients[client].map_request.find("Content-Length") == clients[client].map_request.end() &&
 		clients[client].map_request.find("Transfer-Encoding") == clients[client].map_request.end())
 	{
-		clients[client].is_post = 1;
+		clients[client].flag_res = 1;
 		clients[client].exit_status.first = "400";
 		clients[client].exit_status.second = "400 Bad Request";
 	}
 	else if (clients[client].path.size() > 2048)
 	{
+		clients[client].flag_res = 1;
 		clients[client].exit_status.first = "414";
 		clients[client].exit_status.second = "414 URI Too Long";
 	}
 	else if (per != -1)
 	{
+		clients[client].flag_res = 1;
 		clients[client].exit_status.first = "400";
 		clients[client].exit_status.second = "400 Bad Request";
 	}

@@ -102,7 +102,7 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 	{
 		statut_code(client, itSrv->err_pages, client.exit_status.first, client.exit_status.second);
 	}
-	if (client.body.size() > itSrv->mx_cl_bd_size)
+	else if (client.body.size() > itSrv->mx_cl_bd_size)
 	{
 		// 413 Request Entity Too Large
 		statut_code(client, itSrv->err_pages, "413", "413 Request Entity Too Large");
