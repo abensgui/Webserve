@@ -18,14 +18,14 @@ std::deque<server>::iterator select_server(std::deque<server> &Srv, clients_info
 
 	while (it != Srv.end())
 	{
-		if ( it->server_name == client.host && it->port == client.port)
+		if (it->server_name == client.host && it->port == client.port)
 			return (it);
 		it++;
 	}
 	it = Srv.begin();
 	while (it != Srv.end())
 	{
-		if (it->host == client.host  && it->port == client.port)
+		if (it->host == client.host && it->port == client.port)
 			return (it);
 		it++;
 	}
@@ -93,40 +93,43 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 	itSrv = select_server(Srv, client);
 	if (itSrv == Srv.end())
 		itSrv = Srv.begin();
+	
 	client.itSrv = itSrv;
 	client.err_client = itSrv->err_pages;
 	itLoc = location_match(itSrv->locations, client.path);
 	client.itLoc = itLoc;
-	if (itLoc == itSrv->locations.end())
+	if (!client.exit_status.first.empty())
+	{
+		statut_code(client, itSrv->err_pages, client.exit_status.first, client.exit_status.second);
+	}
+	if (client.body.size() > itSrv->mx_cl_bd_size)
+	{
+		// 413 Request Entity Too Large
+		statut_code(client, itSrv->err_pages, "413", "413 Request Entity Too Large");
+	}
+	else if (itLoc == itSrv->locations.end())
 	{
 		statut_code(client, itSrv->err_pages, "404", "404 Not Found");
 	}
 	else
 	{
-		if(!client.exit_status.first.empty())
+		if (methodAllow(client.method, itLoc->allow_methods))
 		{
-			statut_code(client, itSrv->err_pages, client.exit_status.first, client.exit_status.second);
+			if (!itLoc->redirection.empty())
+			{
+				client.flagRed = true;
+				ft_redi(itLoc->redirection, client);
+			}
+			else if (client.method == "GET")
+				ft_get(itLoc, client, itSrv->err_pages);
+			else if (client.method == "POST")
+				ft_post(itLoc, client, itSrv->err_pages);
+			else if (client.method == "DELETE")
+				ft_delete(itLoc, client, itSrv->err_pages);
 		}
 		else
 		{
-			if (methodAllow(client.method, itLoc->allow_methods))
-			{
-				if (!itLoc->redirection.empty())
-				{
-					client.flagRed = true;
-					ft_redi(itLoc->redirection, client);
-				}
-				else if (client.method == "GET")
-					ft_get(itLoc, client, itSrv->err_pages);
-				else if (client.method == "POST")
-					ft_post(itLoc, client, itSrv->err_pages);
-				else if (client.method == "DELETE")
-					ft_delete(itLoc, client, itSrv->err_pages);
-			}
-			else
-			{
-				statut_code(client, itSrv->err_pages, "405", "Method Not Allowed");
-			}
+			statut_code(client, itSrv->err_pages, "405", "Method Not Allowed");
 		}
 	}
 }

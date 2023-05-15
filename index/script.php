@@ -1,7 +1,7 @@
 <?php
 // Check if form was submitted
 if(isset($_POST["submit"])) {
-
+  echo "asdsad";
   // Check if file was uploaded without errors
   if(isset($_FILES["fileToUpload"]) && $_FILES["fileToUpload"]["error"] == 0) {
     $target_dir = "sup/";

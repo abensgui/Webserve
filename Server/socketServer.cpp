@@ -187,10 +187,6 @@ void SocketServer::connection(std::deque<server> &srv)
                 if (clients[it_client].flag_res == 0)
                 {
                     parse_request(it_client);
-                    if (clients[it_client].body.size() > srv[it_srv].mx_cl_bd_size)
-                    {
-                        // 413 Request Entity Too Large
-                    }
                 }
 
                 if (clients[it_client].flag_res == 1)
