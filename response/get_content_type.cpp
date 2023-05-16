@@ -79,5 +79,10 @@ std::string get_extension(std::string path)
 		return ".plain";
 	if (path == "video/mp4")
 		return ".mp4";
+<<<<<<< HEAD
+	if(strcmp(path, "plain/text") == 0)
+		return(".txt");
+=======
+>>>>>>> 0442997b353148b0bc54230fecaf64f8e7180a3c
 	return "";
 }
