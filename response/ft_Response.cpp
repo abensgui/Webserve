@@ -52,11 +52,11 @@ std::deque<location>::iterator location_match(std::deque<location> &loc, std::st
 	return (it);
 }
 
-void ft_redi(std::string redi, clients_info &client)
+void ft_redi(clients_info &client)
 {
 	client.header = "HTTP/1.1 301 Moved Permanently\r\n"
 					"Location: " +
-					redi + "\r\n\n\r";
+					client.itLoc->redirection  + "\r\n\n\r";
 	send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
 }
 
@@ -95,21 +95,20 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 		itSrv = Srv.begin();
 	
 	client.itSrv = itSrv;
-	client.err_client = itSrv->err_pages;
 	itLoc = location_match(itSrv->locations, client.path);
 	client.itLoc = itLoc;
 	if (!client.exit_status.first.empty())
 	{
-		statut_code(client, itSrv->err_pages, client.exit_status.first, client.exit_status.second);
+		statut_code(client, client.exit_status.first, client.exit_status.second);
 	}
 	else if (client.body.size() > itSrv->mx_cl_bd_size)
 	{
 		// 413 Request Entity Too Large
-		statut_code(client, itSrv->err_pages, "413", "413 Request Entity Too Large");
+		statut_code(client, "413", "413 Request Entity Too Large");
 	}
 	else if (itLoc == itSrv->locations.end())
 	{
-		statut_code(client, itSrv->err_pages, "404", "404 Not Found");
+		statut_code(client, "404", "404 Not Found");
 	}
 	else
 	{
@@ -118,18 +117,18 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 			if (!itLoc->redirection.empty())
 			{
 				client.flagRed = true;
-				ft_redi(itLoc->redirection, client);
+				ft_redi(client);
 			}
 			else if (client.method == "GET")
-				ft_get(itLoc, client, itSrv->err_pages);
+				ft_get(client);
 			else if (client.method == "POST")
-				ft_post(itLoc, client, itSrv->err_pages);
+				ft_post(client);
 			else if (client.method == "DELETE")
-				ft_delete(itLoc, client, itSrv->err_pages);
+				ft_delete(client);
 		}
 		else
 		{
-			statut_code(client, itSrv->err_pages, "405", "Method Not Allowed");
+			statut_code(client, "405", "Method Not Allowed");
 		}
 	}
 }

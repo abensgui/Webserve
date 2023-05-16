@@ -52,7 +52,6 @@ class  clients_info
         int         is_chunk;
         std::pair<std::string, std::string> exit_status;
         //error
-        std::map<std::string, std::string> err_client;
         std::string post_file;
         std::deque<location>::iterator itLoc;
         std::deque<server>::iterator itSrv;

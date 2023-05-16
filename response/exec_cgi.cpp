@@ -18,36 +18,31 @@ std::deque<std::string> get_env(clients_info &client, std::string file)
 	return (env);
 }
 
-void exec_cgi(clients_info &client, std::string file, std::map<std::string, std::string> err_pages)
+void exec_cgi(clients_info &client, std::string file)
 {
 
 	if (client.flag_header == 0)
 	{
-		(void)err_pages;
 		int fd;
 		int fd1;
 		time_t timee;
 		timee = time(NULL);
 		size_t i = 0;
-		////////////////////////////////////
+
 		std::deque<std::string> envd;
 		envd = get_env(client, file);
 		char *env[envd.size() + 1];
-		std::cout << "\n\n\n------------------------\n";
 		while (i < envd.size())
 		{
 			env[i] = (char *)envd[i].c_str();
 			std::cout << env[i] << std::endl;
 			i++;
 		}
-		std::cout << "------------------------\n\n";
 		env[i] = NULL;
-		///////////////////////
+
+
 		if (file.find("?"))
-		{
 			file = file.substr(0, file.find("?"));
-		}
-		//////////////////////
 
 		client.fs.close();
 		client.file_aa = "trach/res" + std::to_string(timee);

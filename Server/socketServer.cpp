@@ -40,7 +40,6 @@ clients_info &clients_info::operator=(const clients_info &obj)
     fs << obj.file.rdbuf();
     // end
 
-    err_client = obj.err_client;
     post_file = obj.post_file;
     itLoc = obj.itLoc;
     itSrv = obj.itSrv;

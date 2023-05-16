@@ -11,11 +11,11 @@ size_t get_len(clients_info &client)
 	return(ss.length() - ss.find("\r\n\r\n") - 5);
 }
 
-void statut_code(clients_info &client, std::map<std::string, std::string> err_pages, std::string err, std::string statut)
+void statut_code(clients_info &client, std::string err, std::string statut)
 {
 	if (client.flag_header == 0)
 	{
-		client.file.open(err_pages[err], std::ios::in | std::ios::binary | std::ios::ate);
+		client.file.open(client.itSrv->err_pages[err], std::ios::in | std::ios::binary | std::ios::ate);
 		client.file.seekg(0, std::ios::end);
 		client.size = client.file.tellg();
 		client.file.seekg(0, std::ios::beg);
@@ -38,7 +38,7 @@ void statut_code(clients_info &client, std::map<std::string, std::string> err_pa
 	}
 }
 
-void ok_200(clients_info &client, std::string file, std::map<std::string, std::string> err_pages)
+void ok_200(clients_info &client, std::string file)
 {
 	if (client.flag_header == 0)
 	{
@@ -50,12 +50,12 @@ void ok_200(clients_info &client, std::string file, std::map<std::string, std::s
 
 		if (!client.file.is_open())
 		{
-			statut_code(client, err_pages, "403", "403 Forbidden");
+			statut_code(client, "403", "403 Forbidden");
 		}
 		client.header = "HTTP/1.1 200 OK\r\n"
 						"Connection: close\r\n"
 						"Content-Type: " +
-						get_content_type(file.c_str()) + "\r\n"
+						get_content_type(file) + "\r\n"
 														 "Content-Length: " +
 						std::to_string(client.size) + "\r\n\r\n";
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
@@ -78,11 +78,11 @@ void ft_send(clients_info &client)
 				path.replace(0, client.itLoc->path_location.length(), client.itLoc->root);
 			else
 				path.replace(0, client.itLoc->path_location.length() - 1, client.itLoc->root);
-			exec_cgi(client, path, client.err_client);
+			exec_cgi(client, path);
 		}
 		else
 		{
-			statut_code(client, client.err_client, "201", "201 created");
+			statut_code(client, "201", "201 created");
 			client.flagRed = true;
 		}
 	}
@@ -93,7 +93,7 @@ void ft_send(clients_info &client)
 		client.file.open(client.file_aa, std::ios::in);
 		if (!client.file.is_open())
 		{
-			statut_code(client, client.err_client, "403", "413 Forbidden");
+			statut_code(client, "403", "413 Forbidden");
 		}
 		client.header = "HTTP/1.1 200 OK\r\n"
 						"Connection: close\r\n"

@@ -19,32 +19,30 @@
 void ft_Response(std::deque<server> &Srv, clients_info &client);
 void ft_send(clients_info &client);
 
-std::string get_content_type(const char *path);
-std::string get_extension(const char *path);
+std::string get_content_type(std::string path);
+std::string get_extension(std::string path);
 std::deque<std::string> get_env(clients_info &client);
 
 
 void default_err(clients_info &client, std::string status);
 
-void statut_code(clients_info &client, std::map<std::string, std::string> err_pages, std::string err, std::string statut);
-void ok_200(clients_info &client, std::string file, std::map<std::string, std::string> err_pages);
-void ft_get(std::deque<location>::iterator itLoc, clients_info &client, std::map<std::string, std::string> err_pages);
-void ft_post(std::deque<location>::iterator itLoc, clients_info &client, std::map<std::string, std::string> err_pages);
-void ft_delete(std::deque<location>::iterator itLoc, clients_info &client, std::map<std::string, std::string> err_pages);
+void statut_code(clients_info &client, std::string err, std::string statut);
+void ok_200(clients_info &client, std::string file);
+void ft_get(clients_info &client);
+void ft_post(clients_info &client);
+void ft_delete(clients_info &client);
 
 
-void listDir(clients_info &client, std::string file, std::deque<location>::iterator itLoc);
+void listDir(clients_info &client, std::string file);
 bool is_fileOrDir(std::string path);
 bool methodAllow(std::string met, std::deque<std::string> metA);
-void ft_redi(std::string redi, clients_info &client);
+void ft_redi(clients_info &client);
 void listDir(clients_info &client, std::string file);
 
 std::string delSp(std::string file);
 
 
-void exec_cgi(clients_info &client,std::string file, std::map<std::string, std::string> err_pages);
-
-void listDir(clients_info &client, std::string file, std::deque<location>::iterator itLoc);
+void exec_cgi(clients_info &client,std::string file);
 
 
 #endif /* ***************************************************** GETRESPONSE_H */

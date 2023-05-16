@@ -1,79 +1,88 @@
 #include "ft_Response.hpp"
 
-std::string get_content_type(const char *path)
+std::string get_content_type(std::string path)
 {
-	const char *last_dot = strrchr(path, '.');
-	if (last_dot)
+	size_t p = path.find_last_of(".");
+	std::string ext;
+	if(p != std::string::npos)
 	{
-		if (strcmp(last_dot, ".css") == 0)
-			return "text/css";
-		if (strcmp(last_dot, ".csv") == 0)
-			return "text/csv";
-		if (strcmp(last_dot, ".gif") == 0)
-			return "image/gif";
-		if (strcmp(last_dot, ".htm") == 0)
-			return "text/html";
-		if (strcmp(last_dot, ".html") == 0)
-			return "text/html";
-		if (strcmp(last_dot, ".ico") == 0)
-			return "image/x-icon";
-		if (strcmp(last_dot, ".jpeg") == 0)
-			return "image/jpeg";
-		if (strcmp(last_dot, ".jpg") == 0)
-			return "image/jpeg";
-		if (strcmp(last_dot, ".js") == 0)
-			return "application/javascript";
-		if (strcmp(last_dot, ".json") == 0)
-			return "application/json";
-		if (strcmp(last_dot, ".png") == 0)
-			return "image/png";
-		if (strcmp(last_dot, ".pdf") == 0)
-			return "application/pdf";
-		if (strcmp(last_dot, ".svg") == 0)
-			return "image/svg+xml";
-		if (strcmp(last_dot, ".txt") == 0)
-			return "text/plain";
-		if (strcmp(last_dot, ".mp4") == 0)
-			return "video/mp4";
+		ext = path.substr(p, path.length() - p);
+		if (!ext.empty())
+		{
+			if (ext ==  ".css")
+				return "text/css";
+			if (ext ==  ".csv")
+				return "text/csv";
+			if (ext ==  ".gif")
+				return "image/gif";
+			if (ext ==  ".htm")
+				return "text/html";
+			if (ext ==  ".html")
+				return "text/html";
+			if (ext ==  ".ico")
+				return "image/x-icon";
+			if (ext ==  ".jpeg")
+				return "image/jpeg";
+			if (ext ==  ".jpg")
+				return "image/jpeg";
+			if (ext ==  ".js")
+				return "application/javascript";
+			if (ext ==  ".json")
+				return "application/json";
+			if (ext ==  ".png")
+				return "image/png";
+			if (ext ==  ".pdf")
+				return "application/pdf";
+			if (ext ==  ".svg")
+				return "image/svg+xml";
+			if (ext ==  ".txt")
+				return "text/plain";
+			if (ext ==  ".mp4")
+				return "video/mp4";
+		}
+
 	}
 	return "application/octet-stream";
 }
 
-std::string get_extension(const char *path)
+std::string get_extension(std::string path)
 {
-	if (strcmp(path, "text/css") == 0)
+	if (path == "text/css")
 		return ".css";
-	if (strcmp(path, "text/csv") == 0)
+	if (path == "text/csv")
 		return ".csv";
-	if (strcmp(path, "image/gif") == 0)
+	if (path == "image/gif")
 		return ".gif";
-	if (strcmp(path, "text/htm") == 0)
+	if (path == "text/htm")
 		return ".html";
-	if (strcmp(path, "text/html") == 0)
+	if (path == "text/html")
 		return ".html";
-	if (strcmp(path, "text/php") == 0)
+	if (path == "text/php")
 		return ".php";
-	if (strcmp(path, "image/ico") == 0)
+	if (path == "image/ico")
 		return ".x-icon";
-	if (strcmp(path, "image/jpeg") == 0)
+	if (path == "image/jpeg")
 		return ".jpeg";
-	if (strcmp(path, "image/jpg") == 0)
+	if (path == "image/jpg")
 		return ".jpeg";
-	if (strcmp(path, "application/js") == 0)
+	if (path == "application/js")
 		return ".javascript";
-	if (strcmp(path, "application/json") == 0)
+	if (path == "application/json")
 		return ".json";
-	if (strcmp(path, "image/png") == 0)
+	if (path == "image/png")
 		return ".png";
-	if (strcmp(path, "application/pdf") == 0)
+	if (path == "application/pdf")
 		return ".pdf";
-	if (strcmp(path, "image/svg") == 0)
+	if (path == "image/svg")
 		return ".svg+xml";
-	if (strcmp(path, "text/txt") == 0)
+	if (path == "text/txt")
 		return ".plain";
-	if (strcmp(path, "video/mp4") == 0)
+	if (path == "video/mp4")
 		return ".mp4";
+<<<<<<< HEAD
 	if(strcmp(path, "plain/text") == 0)
 		return(".txt");
+=======
+>>>>>>> 0442997b353148b0bc54230fecaf64f8e7180a3c
 	return "";
 }
