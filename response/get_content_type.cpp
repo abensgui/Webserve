@@ -73,5 +73,7 @@ std::string get_extension(const char *path)
 		return ".plain";
 	if (strcmp(path, "video/mp4") == 0)
 		return ".mp4";
-	return "application/octet-stream";
+	if(strcmp(path, "plain/text") == 0)
+		return(".txt");
+	return "";
 }

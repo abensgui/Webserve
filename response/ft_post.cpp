@@ -18,14 +18,9 @@ void ft_post(std::deque<location>::iterator itLoc, clients_info &client, std::ma
 		if (client.end_header_req == 1)
 		{
 			timee = time(NULL);
-			if(!itLoc->cgi_path.empty())
-				file = delSp("upload/upload_" + std::to_string(timee));  
-			else
-			{
-				
-				file = delSp(itLoc->upload_path + "/" + std::to_string(timee) + get_extension(client.map_request["Content-Type"].c_str()));
-			}
+			file = delSp(itLoc->upload_path + "/" + std::to_string(timee) + get_extension(client.map_request["Content-Type"].c_str()));
 			client.post_file = file;
+			std::cout << "----------------------------------  "<<file <<std::endl;			
 			client.fs.open(file, std::fstream::out);
 			if (!client.fs.is_open())
 			{

@@ -73,6 +73,8 @@ void SocketServer::parse_header(int client)
 void SocketServer::parse_request(int it_client)
 {
 	int len_recived = recv(clients[it_client].socket_client_id, clients[it_client].request, MAX_SIZE, 0);
+	// std::cout << len_recived << std::endl;
+	std::cout << "REQ :|" << clients[it_client].request << "|\n";
 	if (len_recived < 0)
 	{
 		clients[it_client].fs.close();
@@ -105,6 +107,11 @@ void SocketServer::parse_request(int it_client)
 				clients[it_client].post_finished = 1;
 		}
 	}
-	if (len_recived < MAX_SIZE)
-		clients[it_client].flag_res = 1;
+	std::cout << "SIZE :|" << clients[it_client].body.size() << " == " << clients[it_client].content_len << "|\n";
+	if (clients[it_client].body.size() >= clients[it_client].content_len)
+	{
+		// std::cout << "SIZE :|" << clients[it_client].body.size() << " == " << clients[it_client].content_len << "|\n";
+		// std::cout << "REQ :|" << clients[it_client].body << "|\n";
+	 	clients[it_client].flag_res = 1;
+	}
 }
