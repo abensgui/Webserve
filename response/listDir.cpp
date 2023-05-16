@@ -1,6 +1,6 @@
 #include "ft_Response.hpp"
 
-void listDir(clients_info &client, std::string file, std::deque<location>::iterator itLoc)
+void listDir(clients_info &client, std::string file)
 {
 	std::string output;
 	output.append("<html><body><ul>");
@@ -12,7 +12,7 @@ void listDir(clients_info &client, std::string file, std::deque<location>::itera
 		while ((ent = readdir(dir)) != NULL)
 		{
 			output.append("<li><a href=\"");
-			if (itLoc->path_location == "/" && client.path == "/")
+			if (client.itLoc->path_location == "/" && client.path == "/")
 				output.append(client.path + ent->d_name);
 			else
 				output.append(client.path + "/" + ent->d_name);

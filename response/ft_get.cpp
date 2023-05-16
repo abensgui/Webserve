@@ -26,52 +26,52 @@ bool check_ext(std::string path)
 	return (false);
 }
 
-void ft_get(std::deque<location>::iterator itLoc, clients_info &client, std::map<std::string, std::string> err_pages)
+void ft_get(clients_info &client)
 {
 	std::string file;
 	std::string cookie;
 	file = client.path;
 	size_t i = 0;
-	if (itLoc->path_location != "/")
-		file.replace(0, itLoc->path_location.length(), itLoc->root);
+	if (client.itLoc->path_location != "/")
+		file.replace(0, client.itLoc->path_location.length(), client.itLoc->root);
 	else
-		file.replace(0, itLoc->path_location.length() - 1, itLoc->root);
+		file.replace(0, client.itLoc->path_location.length() - 1, client.itLoc->root);
 	file = delSp(file);
 	if (is_fileOrDir(file))
 	{
-		if (itLoc->auto_index == "on")
-			listDir(client, file, itLoc);
+		if (client.itLoc->auto_index == "on")
+			listDir(client, file);
 		else
 		{
-			while (i < itLoc->index.size())
+			while (i < client.itLoc->index.size())
 			{
-				std::ifstream file1(itLoc->index[i]);
+				std::ifstream file1(client.itLoc->index[i]);
 				if (file1.good())
 				{
-					if (!itLoc->cgi_path.empty())
-						exec_cgi(client, file, err_pages);
+					if (!client.itLoc->cgi_path.empty())
+						exec_cgi(client, file);
 					else
-						ok_200(client, itLoc->index[i], err_pages);
+						ok_200(client, client.itLoc->index[i]);
 				}
 				else
 					i++;
 			}
-			if (i == itLoc->index.size())
-				statut_code(client, err_pages, "404", "404 Not Found");
+			if (i == client.itLoc->index.size())
+				statut_code(client, "404", "404 Not Found");
 		}
 	}
 	else
 	{
 		std::ifstream file1(file);
-		if (!itLoc->cgi_path.empty() && check_ext(file))
+		if (!client.itLoc->cgi_path.empty() && check_ext(file))
 		{
 			std::cout << file << "---- cgi ---- \n";
-			exec_cgi(client, file, err_pages);
+			exec_cgi(client, file);
 		}
 		else if (file1.good())
 		{
-				ok_200(client, file, err_pages);
+				ok_200(client, file);
 		}
-		else statut_code(client, err_pages, "404", "404 Not Found");
+		else statut_code(client, "404", "404 Not Found");
 	}
 }
