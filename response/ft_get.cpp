@@ -32,6 +32,8 @@ void ft_get(clients_info &client)
 	std::string cookie;
 	file = client.path;
 	size_t i = 0;
+    
+    std::cout << client.itSrv->err_pages["404"]<< " -----\n";
 	if (client.itLoc->path_location != "/")
 		file.replace(0, client.itLoc->path_location.length(), client.itLoc->root);
 	else

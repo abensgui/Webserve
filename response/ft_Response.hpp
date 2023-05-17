@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sstream>
 #include <dirent.h>
 #include <cstdio>
 #include <sys/stat.h>
@@ -43,6 +44,15 @@ std::string delSp(std::string file);
 
 
 void exec_cgi(clients_info &client,std::string file);
+
+
+template <typename T>
+std::string ft_to_string(const T& value)
+{
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+}
 
 
 #endif /* ***************************************************** GETRESPONSE_H */

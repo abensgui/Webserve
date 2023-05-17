@@ -5,7 +5,7 @@ std::deque<std::string> get_env(clients_info &client, std::string file)
 	std::deque<std::string> env;
 	env.push_back("REQUEST_METHOD=" + client.method);
 	env.push_back("SCRIPT_FILENAME=" + file.substr(0, file.find("?")));
-	env.push_back("CONTENT_LENGTH=" + std::to_string(client.content_len));
+	env.push_back("CONTENT_LENGTH=" + ft_to_string(client.content_len));
 	env.push_back("CONTENT_TYPE=" + client.map_request["Content-Type"]);
 	env.push_back("REDIRECT_STATUS=200");
 	env.push_back("HTTP_COOKIE=" + client.map_request["Cookie"]);
@@ -40,34 +40,38 @@ void exec_cgi(clients_info &client, std::string file)
 		}
 		env[i] = NULL;
 
-
 		if (file.find("?"))
 			file = file.substr(0, file.find("?"));
+		std::cout << file << std::endl;
 
 		client.fs.close();
-		client.file_aa = "trach/res" + std::to_string(timee);
+		client.file_aa = "trach/res" + ft_to_string(timee);
 		client.pid = fork();
 		if (client.pid == 0)
 		{
 			if (client.method == "GET")
 			{
 				fd = open(file.c_str(), O_RDONLY);
-				fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
+				fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR, 0777);
 			}
 			else
 			{
 
 				fd = open(client.post_file.c_str(), O_RDONLY);
-				fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
+				fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR , 0777);
 			}
+			
 			dup2(fd, 0);
 			dup2(fd1, 1);
 			close(fd);
 			close(fd1);
 			char *args[] = {(char *)client.itLoc->cgi_path.c_str(), (char *)file.c_str(), NULL};
-			execve(args[0], args, env);
+			execve(args[0], args, NULL);
+			std::cout << "sssssssss";
+			exit(1);
 		}
 
 		client.flag_header = 1;
+		client.exe_cgi = 1;
 	}
 }

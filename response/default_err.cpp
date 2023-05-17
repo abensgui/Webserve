@@ -9,8 +9,16 @@ void default_err(clients_info &client, std::string status)
                     "\r\nConnection: close\r\n"
                     "Content-Type: text/html\r\n"
                     "Content-Length:" +
-                    std::to_string(output.length()) +
+                    ft_to_string(output.length()) +
                     "\r\n\r\n";
-    send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
-    send(client.socket_client_id, output.c_str(), output.length(), 0);
+    if (send(client.socket_client_id, client.header.c_str(), client.header.size(), 0) <= 0)
+    {
+        client.flagRed = true;
+        return;
+    }
+    if (send(client.socket_client_id, output.c_str(), output.length(), 0) <= 0)
+    {
+        client.flagRed = true;
+        return;
+    }
 }

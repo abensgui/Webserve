@@ -89,18 +89,13 @@ void ft_send(clients_info &client)
 	
 	if (waitpid(client.pid, 0, WNOHANG) != 0 && !client.itLoc->cgi_path.empty() && client.send_hed == 0 && client.flag_ff == 0)
 	{
-		client.file.close();
 		client.file.open(client.file_aa, std::ios::in);
 		if (!client.file.is_open())
 		{
 			statut_code(client, "403", "413 Forbidden");
 		}
 		client.header = "HTTP/1.1 200 OK\r\n"
-						"Connection: close\r\n"
-						"Content-Length: " +
-						std::to_string(get_len(client)) + "\r\n";
-		client.file.close();
-		client.file.open(client.file_aa, std::ios::in);
+						"Connection: close\r\n";
 		client.send_hed = 1;
 		send(client.socket_client_id, client.header.c_str(), client.header.size(), 0);
 		client.flag_ff = 1;
@@ -111,7 +106,11 @@ void ft_send(clients_info &client)
 		client.file.read(client.response, MAX_SIZE);
 		if (client.file.gcount())
 		{
-			send(client.socket_client_id, client.response, client.file.gcount(), 0);
+			if (send(client.socket_client_id, client.response, client.file.gcount(), 0) <= 0)
+			{
+				client.clear_client = true;
+				return;
+			}
 			bzero(client.response, client.file.gcount());
 		}
 	}
