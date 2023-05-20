@@ -57,11 +57,8 @@ void ft_redi(clients_info &client)
 	client.header = "HTTP/1.1 301 Moved Permanently\r\n"
 					"Location: " +
 					client.itLoc->redirection  + "\r\n\n\r";
-	if(send(client.socket_client_id, client.header.c_str(), client.header.size(), 0) <= 0)
-	{
-		client.flagRed = true;
-		return ;
-	}
+	if (send(client.socket_client_id, client.header.c_str(), client.header.size(), 0) <= 0)
+		return;
 }
 
 bool methodAllow(std::string met, std::deque<std::string> metA)
@@ -132,7 +129,6 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 		}
 		else
 		{
-			std::cout << "hada-----------\n";
 			statut_code(client, "405", "Method Not Allowed");
 		}
 	}

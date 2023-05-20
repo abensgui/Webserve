@@ -114,43 +114,30 @@ void SocketServer::wait_clients(std::deque<server> &srv)
 {
     FD_ZERO(&reads);
     FD_ZERO(&writer);
+    // time.tv_sec = 0;
+    // time.tv_usec = 500;
     size_t it_srv = 0;
     int max_socket = 0;
     while (it_srv < srv.size())
     {
         FD_SET(srv[it_srv].socket_id, &reads);
-        max_socket = srv[it_srv].socket_id;
+        if (srv[it_srv].socket_id > max_socket)
+            max_socket = srv[it_srv].socket_id;
         it_srv++;
     }
     size_t it_client = 0;
     while (it_client < clients.size())
     {
-        if (clients[it_client].socket_client_id > 0)
-        {
-            FD_SET(clients[it_client].socket_client_id, &reads);
-            if (clients[it_client].socket_client_id > max_socket)
-            {
-                max_socket = clients[it_client].socket_client_id;
-            }
-        }
+        FD_SET(clients[it_client].socket_client_id, &reads);
+        FD_SET(clients[it_client].socket_client_id, &writer);
+        if (clients[it_client].socket_client_id > max_socket)
+            max_socket = clients[it_client].socket_client_id;
         it_client++;
     }
-    it_client = 0;
-    while (it_client < clients.size())
-    {
-        if (clients[it_client].socket_client_id > 0)
-        {
-            FD_SET(clients[it_client].socket_client_id, &writer);
-            if (clients[it_client].socket_client_id > max_socket)
-            {
-                max_socket = clients[it_client].socket_client_id;
-            }
-        }
-        it_client++;
-    }
-    // std::cout << "client " << max_socket<< std::endl;
+    std::cout << "BEFORE HERE CLIENT : "<< "\n";
     if (select(max_socket + 1, &reads, &writer, 0, 0) < 0)
         std::cout << "Select : Failed\n";
+    std::cout << "AFTER HERE CLIENT : " << "\n";
 }
 
 void SocketServer::connection(std::deque<server> &srv)
@@ -168,6 +155,7 @@ void SocketServer::connection(std::deque<server> &srv)
             {
                 it_client = get_client();
                 clients[it_client].socket_client_id = accept(srv[it_srv].socket_id, (struct sockaddr *)&(clients[it_client].address), &clients[it_client].addr_len);
+                fcntl(clients[it_client].socket_client_id, F_SETFL, O_NONBLOCK);
                 if (clients[it_client].socket_client_id < 0)
                 {
                     std::cerr << "Error in Connection\n";
@@ -179,32 +167,29 @@ void SocketServer::connection(std::deque<server> &srv)
             it_srv++;
         }
         it_client = 0;
-        
         while (it_client < clients.size())
         {
-            if (FD_ISSET(clients[it_client].socket_client_id, &writer))
+            if (FD_ISSET(clients[it_client].socket_client_id, &reads))
             {
                 if (clients[it_client].flag_res == 0)
-                {
                     parse_request(it_client);
-                }
-
+            }
+            // std::cout << "BEFORE HERE CLIENT : " << clients[it_client].socket_client_id << "\n";
+            if (FD_ISSET(clients[it_client].socket_client_id, &writer))
+            {
                 if (clients[it_client].flag_res == 1)
                 {
                     if (clients[it_client].flag_header == 0)
                         ft_Response(srv, clients[it_client]);
                     ft_send(clients[it_client]);
                 }
-                
-
                 if (clients[it_client].clear_client == true && clients[it_client].removed == 0)
                 {
-                    
                     clients[it_client].file.close();
                     remove_client(clients[it_client].socket_client_id);
-                    clients[it_client].flagRed = false;
                 }
             }
+            // std::cout << "AFTER HERE CLIENT : " << clients[it_client].socket_client_id << "\n";
             it_client++;
         }
     }
@@ -219,22 +204,30 @@ void SocketServer::run_server(std::deque<server> &servers)
         memset(&ServerAddr, 0, sizeof(ServerAddr));
         ServerAddr.ai_family = AF_INET;
         ServerAddr.ai_socktype = SOCK_STREAM;
-        struct addrinfo *bindi;
-        int add = getaddrinfo(servers[i].host.c_str(), servers[i].port.c_str(), &ServerAddr, &bindi);
-        if (add < 0)
+        struct addrinfo *Res;
+        int addr = getaddrinfo(servers[i].host.c_str(), servers[i].port.c_str(), &ServerAddr, &Res);
+        if (addr < 0)
+        {
             std::cout << "Error In Get Address Info Server\n";
-        servers[i].socket_id = socket(bindi->ai_family, bindi->ai_socktype, bindi->ai_protocol);
+            exit(1);
+        }
+        std::cout << "Add : " << addr << "\n";
+        servers[i].socket_id = socket(Res->ai_family, Res->ai_socktype, Res->ai_protocol);
+        fcntl(servers[i].socket_id, F_SETFL, O_NONBLOCK);
+        // std::cout << "FCNTL : " << cntl << "\n";
         if (servers[i].socket_id < 0)
             exit(1);
         std::cout << "Creating socket... " << servers[i].socket_id << std::endl;
         // int opt_val = 1;
         // setsockopt(servers[i].socket_id, SOL_SOCKET, SO_REUSEPORT, &opt_val, sizeof(opt_val));
         // // 2 - binding socket ma3a l port d server
-        if (bind(servers[i].socket_id, bindi->ai_addr, bindi->ai_addrlen))
+        if (bind(servers[i].socket_id, Res->ai_addr, Res->ai_addrlen))
+        {
             std::cout << "Error In Bind Server\n";
-        else 
-            std::cout << "Binding socket to local address...\n";
-        freeaddrinfo(bindi);
+            exit(1);
+        }
+        std::cout << "Binding socket to local address...\n";
+        freeaddrinfo(Res);
         // 3- Listen to the Clients connection request
         if (listen(servers[i].socket_id, 128))
         {

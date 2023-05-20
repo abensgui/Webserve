@@ -32,8 +32,6 @@ void ft_get(clients_info &client)
 	std::string cookie;
 	file = client.path;
 	size_t i = 0;
-    
-    std::cout << client.itSrv->err_pages["404"]<< " -----\n";
 	if (client.itLoc->path_location != "/")
 		file.replace(0, client.itLoc->path_location.length(), client.itLoc->root);
 	else
@@ -45,21 +43,27 @@ void ft_get(clients_info &client)
 			listDir(client, file);
 		else
 		{
-			while (i < client.itLoc->index.size())
+			if(client.itLoc->index.size() == 0)
+				statut_code(client, "403", "403 Forbidden");
+			else
 			{
-				std::ifstream file1(client.itLoc->index[i]);
-				if (file1.good())
+				while (i < client.itLoc->index.size())
 				{
-					if (!client.itLoc->cgi_path.empty())
-						exec_cgi(client, file);
-					else
-						ok_200(client, client.itLoc->index[i]);
-				}
-				else
+					std::cout << client.itLoc->index[i] <<"   sdfsfsdf" <<std::endl;
+					std::ifstream file1(client.itLoc->index[i]);
+					if (file1.good())
+					{
+						if (!client.itLoc->cgi_path.empty() && check_ext(file))
+							exec_cgi(client, file);
+						else
+							ok_200(client, client.itLoc->index[i]);
+						break;
+					}
 					i++;
+				}
+				if (i == client.itLoc->index.size())
+					statut_code(client, "404", "404 Not Found");
 			}
-			if (i == client.itLoc->index.size())
-				statut_code(client, "404", "404 Not Found");
 		}
 	}
 	else

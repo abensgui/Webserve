@@ -30,14 +30,7 @@ print('<form method="GET" action="script.py">')
 print('Name: <input type="text" name="name">')
 print('<input type="submit" value="Submit">')
 print('</form>')
-print(f'''
-    <script>
-        const aa = () => document.cookie = "name=kk"
-        document.addEventListener("load", aa);
-    </script>
-''')
 print("</body></html>")
 
 # set the cookie in the response
-print(type(cookie.output()))
 print(cookie.output())

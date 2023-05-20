@@ -33,7 +33,7 @@ if ($name || $session) {
 }
 else {
     echo "<h1>Please enter your name.</h1>";
-    echo '<form method="GET" action="script.php">';
+    echo '<form method="GET" action="cookie.php">';
     echo 'Name: <input type="text" name="name">';
     echo 'Session: <input type="text" name="session">';
     echo '<input type="submit" value="Submit">';

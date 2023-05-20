@@ -21,14 +21,14 @@ void listDir(clients_info &client, std::string file)
 			output.append("</a></li>");
 		}
 		closedir(dir);
-		output.append("</ul></body></html>");
-		client.header = "HTTP/1.1 200 OK\r\n"
-						"Connection: close\r\n"
-						"Content-Type: "
-						"text/html\r\n"
-						"Content-Length: " +
-						ft_to_string(output.size()) +
-						"\r\n\r\n";
+	output.append("</ul></body></html>");
+	client.header = "HTTP/1.1 200 OK\r\n"
+					"Connection: close\r\n"
+					"Content-Type: "
+					"text/html\r\n"
+					"Content-Length: " +
+					ft_to_string(output.size()) +
+					"\r\n\r\n";
 		client.flagRed = true;
 		if (send(client.socket_client_id, client.header.c_str(), client.header.size(), 0) <= 0)
 			return;
@@ -37,6 +37,6 @@ void listDir(clients_info &client, std::string file)
 	}
 	else
 	{
-		statut_code(client, "403", "403 Forbidden");
+		perror("Unable to open directory");
 	}
 }

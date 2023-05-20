@@ -75,6 +75,13 @@ int     confi::setup_configuration(std::string file)
     congi_file.open(file);
     if (congi_file.is_open())
     {
+        congi_file.seekg(0, std::ios::end);
+        if (congi_file.tellg() == 0)
+        {
+            std::cout << "Error : Config File is Empty\n";
+            exit(1);
+        }
+        congi_file.seekg(0, std::ios::beg);
         while (getline(congi_file, line))
         {
             i = -1;
@@ -82,6 +89,7 @@ int     confi::setup_configuration(std::string file)
             {
                 i = 0;
                 j = -1;
+                sr.mx_cl_bd_size = 1000000;
                 while (getline(congi_file, line))
                 {
                     std::stringstream strm(line);
@@ -98,7 +106,6 @@ int     confi::setup_configuration(std::string file)
                             exit(1);
                         }
                         lc.path_location = value;
-                        //Default
                         lc.auto_index = "on";
                         lc.auto_upload = "on";
                         while (getline(congi_file, line))
@@ -156,6 +163,11 @@ int     confi::setup_configuration(std::string file)
                     }
                     else if (!line.compare("}"))
                     {
+                        if ((sr.host.empty() && sr.server_name.empty()) || sr.port.empty() || sr.locations.empty())
+                        {
+                            std::cerr << "You must Follow Our Rules" << std::endl;
+                            exit(1);
+                        }
                         servers.push_back(sr);
                         sr.err_pages.clear();
                         sr.locations.clear();
@@ -187,9 +199,10 @@ int     confi::setup_configuration(std::string file)
                         if (strm.eof())
                             std::cerr << "You must Follow Our Rules" << std::endl;
                         strm >> key;
-                        if (!strm.eof())
+                        if (!strm.eof()) {
                             std::cerr << "You must Follow Our Rules" << std::endl;
-                        sr.err_pages[value] = key;
+                        }
+                            sr.err_pages[value] = key;
                     }
                     else
                     {
@@ -204,6 +217,9 @@ int     confi::setup_configuration(std::string file)
                 exit(1);
             }
         }
+
+        //adding
+
     }
     else
     {

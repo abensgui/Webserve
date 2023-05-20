@@ -8,7 +8,7 @@ if(isset($_POST["submit"])) {
     $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
     
     // Allow certain file formats
-    $allowed_types = array('jpg', 'jpeg', 'png', 'gif');
+    $allowed_types = array('jpg', 'jpeg', 'png', 'gif', 'txt');
     if(in_array($imageFileType, $allowed_types)) {
       // Attempt to move the uploaded file to its new location
       if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {

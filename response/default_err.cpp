@@ -8,7 +8,7 @@ void default_err(clients_info &client, std::string status)
     client.header = "HTTP/1.1 " + status +
                     "\r\nConnection: close\r\n"
                     "Content-Type: text/html\r\n"
-                    "Content-Length:" +
+                    "Content-Length: " +
                     ft_to_string(output.length()) +
                     "\r\n\r\n";
     if (send(client.socket_client_id, client.header.c_str(), client.header.size(), 0) <= 0)
@@ -21,4 +21,6 @@ void default_err(clients_info &client, std::string status)
         client.flagRed = true;
         return;
     }
+    client.flagRed = true;
+
 }

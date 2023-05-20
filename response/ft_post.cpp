@@ -16,7 +16,6 @@ void ft_post(clients_info &client)
 			timee = time(NULL);
 			file = delSp(client.itLoc->upload_path + "/" + ft_to_string(timee) + get_extension(client.map_request["Content-Type"].c_str()));
 			client.post_file = file;
-			std::cout << "----------------------------------  "<<file <<std::endl;			
 			client.fs.open(file, std::fstream::out);
 			if (!client.fs.is_open())
 			{

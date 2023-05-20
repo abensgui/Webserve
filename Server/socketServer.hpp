@@ -60,7 +60,6 @@ class  clients_info
         bool flag_ff;
         bool send_hed;
         bool exe_cgi;
-
 };
 
 class SocketServer {

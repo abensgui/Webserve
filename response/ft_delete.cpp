@@ -17,7 +17,7 @@ void ft_delete(clients_info &client)
 		std::ifstream file1(file);
 		if (file1.good())
 		{
-			if (std::remove(file.c_str()) == 0)
+			if (remove(file.c_str()) == 0)
 				statut_code(client,"200", "202 Accepted");
 			else
 				statut_code(client,  "403", "403 Forbidden");

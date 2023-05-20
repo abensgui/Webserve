@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <sstream>
 #include <dirent.h>
 #include <cstdio>
 #include <sys/stat.h>

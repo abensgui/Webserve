@@ -35,14 +35,12 @@ void exec_cgi(clients_info &client, std::string file)
 		while (i < envd.size())
 		{
 			env[i] = (char *)envd[i].c_str();
-			std::cout << env[i] << std::endl;
 			i++;
 		}
 		env[i] = NULL;
 
 		if (file.find("?"))
 			file = file.substr(0, file.find("?"));
-		std::cout << file << std::endl;
 
 		client.fs.close();
 		client.file_aa = "trach/res" + ft_to_string(timee);
@@ -52,26 +50,22 @@ void exec_cgi(clients_info &client, std::string file)
 			if (client.method == "GET")
 			{
 				fd = open(file.c_str(), O_RDONLY);
-				fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR, 0777);
+				fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
 			}
 			else
 			{
 
 				fd = open(client.post_file.c_str(), O_RDONLY);
-				fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR , 0777);
+				fd1 = open(client.file_aa.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0777);
 			}
-			
 			dup2(fd, 0);
 			dup2(fd1, 1);
 			close(fd);
 			close(fd1);
 			char *args[] = {(char *)client.itLoc->cgi_path.c_str(), (char *)file.c_str(), NULL};
-			execve(args[0], args, NULL);
-			std::cout << "sssssssss";
+			execve(args[0], args, env);
 			exit(1);
 		}
-
 		client.flag_header = 1;
-		client.exe_cgi = 1;
 	}
 }
