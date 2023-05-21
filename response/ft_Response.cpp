@@ -79,7 +79,7 @@ bool is_fileOrDir(std::string path)
 	{
 		if (S_ISDIR(buffer.st_mode))
 		{
-			std::cout << path << " is a directory" << std::endl;
+			// std::cout << path << " is a directory" << std::endl;
 			return (1);
 		}
 	}
@@ -90,7 +90,6 @@ void ft_Response(std::deque<server> &Srv, clients_info &client)
 {
 	std::deque<location>::iterator itLoc;
 	std::deque<server>::iterator itSrv;
-
 	itSrv = select_server(Srv, client);
 	if (itSrv == Srv.end())
 		itSrv = Srv.begin();

@@ -12,13 +12,13 @@
 #include <cstdio>
 #include "../configuration_file/configuration.hpp"
 
-#define MAX_SIZE 1024
+#define MAX_SIZE 2024
 
 class  clients_info
 {
     public:
         socklen_t       addr_len;
-        struct          sockaddr_storage address; // ??
+        struct          sockaddr_storage address;
         int             socket_client_id;
         char            request[MAX_SIZE];
         char            response[MAX_SIZE];
@@ -32,9 +32,6 @@ class  clients_info
         clients_info(const clients_info &);
         clients_info& operator=(const clients_info& obj);
         ~clients_info();
-        // hada mo7al wax ba9in 5damin bih
-        std::string filename_post;
-        //end
         int         is_post;
         size_t      content_len;
         int         end_header;
@@ -65,7 +62,6 @@ class  clients_info
 class SocketServer {
     public :
         fd_set reads, writer;
-        struct timeval time;
         struct addrinfo ServerAddr;
         SocketServer();
         SocketServer(SocketServer const &cpy);

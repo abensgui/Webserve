@@ -49,7 +49,6 @@ void ft_get(clients_info &client)
 			{
 				while (i < client.itLoc->index.size())
 				{
-					std::cout << client.itLoc->index[i] <<"   sdfsfsdf" <<std::endl;
 					std::ifstream file1(client.itLoc->index[i]);
 					if (file1.good())
 					{

@@ -37,6 +37,6 @@ void listDir(clients_info &client, std::string file)
 	}
 	else
 	{
-		perror("Unable to open directory");
+		statut_code(client, "403", "403 Forbidden");
 	}
 }

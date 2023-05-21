@@ -8,13 +8,13 @@ if(isset($_POST["submit"])) {
     $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
     
     // Allow certain file formats
-    $allowed_types = array('jpg', 'jpeg', 'png', 'gif', 'txt');
+    $allowed_types = array('jpg', 'jpeg', 'png', 'gif', 'txt' , 'mp4', 'pdf');
     if(in_array($imageFileType, $allowed_types)) {
       // Attempt to move the uploaded file to its new location
       if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
         echo "The file ". htmlspecialchars( basename( $_FILES["fileToUpload"]["name"])). " has been uploaded.";
       } else {
-        echo "Sorry, there was an error uploading your file.";
+        echo "Sorry, there was an error uploading your file. mp4";
       }
     } else {
       echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";

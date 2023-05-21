@@ -34,7 +34,7 @@ void get_len(clients_info &client)
 					"\r\n" + ss;
 	if (!status.empty())
 	{
-		client.header.replace(9, 6, status);
+		client.header.replace(8, 7, status);
 	}
 }
 
@@ -47,9 +47,7 @@ void statut_code(clients_info &client, std::string err, std::string statut)
 		client.size = client.file.tellg();
 		client.file.seekg(0, std::ios::beg);
 		if (!client.file.is_open())
-		{
 			default_err(client, statut);
-		}
 		else
 		{
 			client.header = "HTTP/1.1 " + statut +
@@ -57,7 +55,6 @@ void statut_code(clients_info &client, std::string err, std::string statut)
 							"Content-Type: text/html\r\n"
 							"Content-Length: " +
 							ft_to_string(client.size) + "\r\n\r\n";
-
 			if (send(client.socket_client_id, client.header.c_str(), client.header.size(), 0) <= 0)
 			{
 				client.clear_client = true;
@@ -152,8 +149,5 @@ void ft_send(clients_info &client)
 
 	}
 	if (client.file.eof()|| client.flagRed == true)
-	{
-		std::cout << "FINISH : " << "\n";
 		client.clear_client = true;
-	}
 }

@@ -4,11 +4,6 @@ void ft_post(clients_info &client)
 {
 	std::string file;
 	time_t timee;
-	// if (client.map_request.find("Content-Type") == client.map_request.end())
-	// {
-	// 	std::cout << "inside code status 404 \n";
-	// 	statut_code(client, "404", "404 Not Found");
-	// }else
 	if (client.itLoc->auto_upload == "on")
 	{
 		if (client.end_header_req == 1)

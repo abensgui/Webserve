@@ -10,7 +10,6 @@ clients_info::clients_info(const clients_info &obj)
 
 clients_info &clients_info::operator=(const clients_info &obj)
 {
-    // declare from Request
     addr_len = obj.addr_len;
     address = obj.address;
     socket_client_id = obj.socket_client_id;
@@ -32,15 +31,11 @@ clients_info &clients_info::operator=(const clients_info &obj)
     removed = obj.removed;
     is_chunk = obj.is_chunk;
     exit_status = obj.exit_status;
-    // declare from Response
     header = obj.header;
     flag_header = obj.flag_header;
     flagRed = obj.flagRed;
-    // t2eked mnha ba9i f l path
     fs.open(path, std::fstream::out | std::fstream::app);
     fs << obj.file.rdbuf();
-    // end
-
     post_file = obj.post_file;
     itLoc = obj.itLoc;
     itSrv = obj.itSrv;
@@ -209,8 +204,6 @@ void SocketServer::run_server(std::deque<server> &servers)
             exit(1);
         fcntl(servers[i].socket_id, F_SETFL, O_NONBLOCK);
         std::cout << "Creating socket... " << servers[i].socket_id << std::endl;
-        // int opt_val = 1;
-        // setsockopt(servers[i].socket_id, SOL_SOCKET, SO_REUSEPORT, &opt_val, sizeof(opt_val));
         // // 2 - binding socket ma3a l port d server
         if (bind(servers[i].socket_id, Res->ai_addr, Res->ai_addrlen))
         {

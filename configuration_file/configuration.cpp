@@ -108,6 +108,7 @@ int     confi::setup_configuration(std::string file)
                         lc.path_location = value;
                         lc.auto_index = "on";
                         lc.auto_upload = "on";
+                        // lc.upload_path = "upload";
                         while (getline(congi_file, line))
                         {
                             std::string key_local, value_local;

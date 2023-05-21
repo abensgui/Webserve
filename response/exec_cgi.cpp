@@ -43,7 +43,7 @@ void exec_cgi(clients_info &client, std::string file)
 			file = file.substr(0, file.find("?"));
 
 		client.fs.close();
-		client.file_aa = "trach/res" + ft_to_string(timee);
+		client.file_aa = "/tmp/res" + ft_to_string(timee);
 		client.pid = fork();
 		if (client.pid == 0)
 		{
@@ -67,5 +67,7 @@ void exec_cgi(clients_info &client, std::string file)
 			exit(1);
 		}
 		client.flag_header = 1;
+		// remove(client.post_file.c_str());
 	}
+	
 }
