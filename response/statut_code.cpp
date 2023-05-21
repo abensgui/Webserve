@@ -6,37 +6,37 @@ void get_len(clients_info &client)
 	std::string status;
 	size_t size_hed = 0;
 	while (std::getline(client.file, line))
-	{	
+	{
 		int pos = line.find("Status:");
-		if(pos != -1)
+		if (pos != -1)
 		{
-			line = line.substr(0,  line.size() - 1);
+			line = line.substr(0, line.size() - 1);
 			status = line.substr(pos + 7);
-			size_hed = line.length() + 2;	
+			size_hed = line.length() + 2;
 		}
 		else
 		{
 			ss.append(line);
 			ss.append("\n");
 		}
-		if(ss.find("\r\n\r\n") != std::string::npos || line.empty())
+		if (ss.find("\r\n\r\n") != std::string::npos || line.empty())
 			break;
 		line.clear();
 	}
 
 	size_hed += ss.length();
-	if(ss.find("Content-type:") == std::string::npos && ss.find("Content-Type:") == std::string::npos)
+	if (ss.find("Content-type:") == std::string::npos && ss.find("Content-Type:") == std::string::npos)
 		ss += "Content-Type: text/html\r\n";
-		
-	client.header =	"HTTP/1.1 200 OK\r\n"
-					"Content-Length: " + ft_to_string(client.size - size_hed) +
+
+	client.header = "HTTP/1.1 200 OK\r\n"
+					"Content-Length: " +
+					ft_to_string(client.size - size_hed) +
 					"\r\n" + ss;
-	if(!status.empty())
+	if (!status.empty())
 	{
 		client.header.replace(9, 6, status);
 	}
 }
-
 
 void statut_code(clients_info &client, std::string err, std::string statut)
 {
@@ -80,9 +80,7 @@ void ok_200(clients_info &client, std::string file)
 		client.file.seekg(0, std::ios::beg);
 
 		if (!client.file.is_open())
-		{
-			statut_code(client, "403", "403 Forbidden");
-		}
+			statut_code(client, "404", "404 Not Found");
 		client.header = "HTTP/1.1 200 OK\r\n"
 						"Connection: close\r\n"
 						"Content-Type: " +
@@ -129,9 +127,7 @@ void ft_send(clients_info &client)
 		client.size = client.file.tellg();
 		client.file.seekg(0, std::ios::beg);
 		if (!client.file.is_open())
-		{
-			statut_code(client, "403", "413 Forbidden");
-		}
+			statut_code(client, "403", "403 Forbidden");
 		get_len(client);
 		client.send_hed = 1;
 		if (send(client.socket_client_id, client.header.c_str(), client.header.size(), 0) <= 0)
@@ -141,27 +137,23 @@ void ft_send(clients_info &client)
 		}
 		client.flag_ff = 1;
 	}
-
 	if (client.flag_ff == 1 || client.itLoc->cgi_path.empty() || client.send_hed)
 	{
 		client.file.read(client.response, MAX_SIZE);
-		// std::cout << "HERE CLIENT : " << client.socket_client_id << "\n";
 		if (client.file.gcount())
 		{
-			// std::cout << "BEFORE : " << "\n";
 			if (send(client.socket_client_id, client.response, client.file.gcount(), 0) <= 0)
 			{
 				client.clear_client = true;
 				return;
 			}
-			// std::cout << "AFTER : " << "\n";
-			bzero(client.response, client.file.gcount());
+			bzero(client.response, MAX_SIZE);
 		}
-	}
 
-	if (client.file.eof() || client.flagRed == true)
+	}
+	if (client.file.eof()|| client.flagRed == true)
 	{
-		// std::cout << "FINISH : " << "\n";
+		std::cout << "FINISH : " << "\n";
 		client.clear_client = true;
 	}
 }

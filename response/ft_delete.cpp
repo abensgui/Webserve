@@ -18,11 +18,11 @@ void ft_delete(clients_info &client)
 		if (file1.good())
 		{
 			if (remove(file.c_str()) == 0)
-				statut_code(client,"200", "202 Accepted");
-			else
-				statut_code(client,  "403", "403 Forbidden");
+				statut_code(client,"202", "202 Accepted");
 		}
+		else if (access(file.c_str(), F_OK))
+			statut_code(client, "404", "404 Not Found");
 		else
-			statut_code(client, "403", "404 Not Found");
+			statut_code(client,  "403", "403 Forbidden");
 	}
 }

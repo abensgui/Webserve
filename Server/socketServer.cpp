@@ -14,7 +14,8 @@ clients_info &clients_info::operator=(const clients_info &obj)
     addr_len = obj.addr_len;
     address = obj.address;
     socket_client_id = obj.socket_client_id;
-    file.open(obj.path_file, std::ios::in | std::ios::binary | std::ios::out);
+    path_file = obj.path_file;
+    file.open(obj.path_file, std::ios::in | std::ios::binary | std::ios::ate);
     file << obj.file.rdbuf();
     size = obj.size;
     method = obj.method;
@@ -114,8 +115,6 @@ void SocketServer::wait_clients(std::deque<server> &srv)
 {
     FD_ZERO(&reads);
     FD_ZERO(&writer);
-    // time.tv_sec = 0;
-    // time.tv_usec = 500;
     size_t it_srv = 0;
     int max_socket = 0;
     while (it_srv < srv.size())
@@ -134,10 +133,11 @@ void SocketServer::wait_clients(std::deque<server> &srv)
             max_socket = clients[it_client].socket_client_id;
         it_client++;
     }
-    std::cout << "BEFORE HERE CLIENT : "<< "\n";
     if (select(max_socket + 1, &reads, &writer, 0, 0) < 0)
+    {
         std::cout << "Select : Failed\n";
-    std::cout << "AFTER HERE CLIENT : " << "\n";
+        exit(1);
+    }
 }
 
 void SocketServer::connection(std::deque<server> &srv)
@@ -174,7 +174,6 @@ void SocketServer::connection(std::deque<server> &srv)
                 if (clients[it_client].flag_res == 0)
                     parse_request(it_client);
             }
-            // std::cout << "BEFORE HERE CLIENT : " << clients[it_client].socket_client_id << "\n";
             if (FD_ISSET(clients[it_client].socket_client_id, &writer))
             {
                 if (clients[it_client].flag_res == 1)
@@ -189,7 +188,6 @@ void SocketServer::connection(std::deque<server> &srv)
                     remove_client(clients[it_client].socket_client_id);
                 }
             }
-            // std::cout << "AFTER HERE CLIENT : " << clients[it_client].socket_client_id << "\n";
             it_client++;
         }
     }
@@ -205,18 +203,11 @@ void SocketServer::run_server(std::deque<server> &servers)
         ServerAddr.ai_family = AF_INET;
         ServerAddr.ai_socktype = SOCK_STREAM;
         struct addrinfo *Res;
-        int addr = getaddrinfo(servers[i].host.c_str(), servers[i].port.c_str(), &ServerAddr, &Res);
-        if (addr < 0)
-        {
-            std::cout << "Error In Get Address Info Server\n";
-            exit(1);
-        }
-        std::cout << "Add : " << addr << "\n";
+        getaddrinfo(servers[i].host.c_str(), servers[i].port.c_str(), &ServerAddr, &Res);
         servers[i].socket_id = socket(Res->ai_family, Res->ai_socktype, Res->ai_protocol);
-        fcntl(servers[i].socket_id, F_SETFL, O_NONBLOCK);
-        // std::cout << "FCNTL : " << cntl << "\n";
         if (servers[i].socket_id < 0)
             exit(1);
+        fcntl(servers[i].socket_id, F_SETFL, O_NONBLOCK);
         std::cout << "Creating socket... " << servers[i].socket_id << std::endl;
         // int opt_val = 1;
         // setsockopt(servers[i].socket_id, SOL_SOCKET, SO_REUSEPORT, &opt_val, sizeof(opt_val));

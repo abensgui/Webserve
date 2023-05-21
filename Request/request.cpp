@@ -72,7 +72,10 @@ void SocketServer::parse_header(int client)
 
 void SocketServer::parse_request(int it_client)
 {
+	// std::cout <<  "BEFORE RECV : " << "\n";
 	int len_recived = recv(clients[it_client].socket_client_id, clients[it_client].request, MAX_SIZE, 0);
+	// std::cout <<  "RECV : " << len_recived << "\n";
+	// std::cout <<  "REQ : " << clients[it_client].request << "\n";
 	if (len_recived <= 0)
 	{
 		clients[it_client].fs.close();
@@ -91,7 +94,15 @@ void SocketServer::parse_request(int it_client)
 			{
 				parse_header(it_client);
 				if (clients[it_client].is_post == 1)
+				{
 					clients[it_client].body = clients[it_client].body.substr(pol + 4);
+					if (clients[it_client].body.size()  == 0 && clients[it_client].content_len > 0)
+					{
+						clients[it_client].flag_res = 1;
+						clients[it_client].exit_status.first = "403";
+						clients[it_client].exit_status.second = "403 Forbidden";
+					}
+				}
 				clients[it_client].end_header_req = 1;
 				if (clients[it_client].body.size() == clients[it_client].content_len || (clients[it_client].is_chunk && pos_chunk != -1))
 					clients[it_client].post_finished = 1;
@@ -107,4 +118,5 @@ void SocketServer::parse_request(int it_client)
 		if (clients[it_client].body.size() >= clients[it_client].content_len)
 			clients[it_client].flag_res = 1;
 	}
+	// std::cout <<  "BODY : " << clients[it_client].body.size() << "\n";
 }

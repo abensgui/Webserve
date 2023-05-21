@@ -4,12 +4,12 @@ void ft_post(clients_info &client)
 {
 	std::string file;
 	time_t timee;
-	if (client.map_request.find("Content-Type") == client.map_request.end())
-	{
-		std::cout << "inside code status 404 \n";
-		statut_code(client, "404", "404 Not Found");
-	}
-	else if (client.itLoc->auto_upload == "on")
+	// if (client.map_request.find("Content-Type") == client.map_request.end())
+	// {
+	// 	std::cout << "inside code status 404 \n";
+	// 	statut_code(client, "404", "404 Not Found");
+	// }else
+	if (client.itLoc->auto_upload == "on")
 	{
 		if (client.end_header_req == 1)
 		{
@@ -19,7 +19,7 @@ void ft_post(clients_info &client)
 			client.fs.open(file, std::fstream::out);
 			if (!client.fs.is_open())
 			{
-				statut_code(client, "500", "Internal Server Error");
+				statut_code(client, "500", "500 Internal Server Error");
 			}
 			client.end_header_req = 2;
 		}

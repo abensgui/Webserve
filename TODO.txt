@@ -1,35 +1,4 @@
 
 =====================
 
-check if no location SGV
-
-check remove client .ico
-
-check content-lenght in post method
-
-check status code return ===> " curl -X POST localhost:8080 -d "lol=ok" -i
-HTTP/1.1 Internal Server Error "
-&&&&
-status code if auto index off and no index in config file
-
-"
-curl -X POST localhost:8080/ok -d "data=data" -i
-HTTP/1.1 413 Request Entity Too Large
-Connection: close
-Content-Type: text/html
-Content-Length:71
-"
-
-
-
-TEST "server
-{
-    host    127.0.0.1
-    port    9090
-location /
-{
-}
-}"
-
-curl -H "Transfer-Encoding: chunked" -d "@config.txt" -d "@TODO.txt" http://127.0.0.1:8080 -i
-STATUS CODE  and FILE IS EMPTY
+1-- check video with fcntl GET Method

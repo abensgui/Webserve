@@ -75,9 +75,10 @@ void ft_get(clients_info &client)
 			exec_cgi(client, file);
 		}
 		else if (file1.good())
-		{
-				ok_200(client, file);
-		}
-		else statut_code(client, "404", "404 Not Found");
+			ok_200(client, file);
+		else if (access(file.c_str(), F_OK))
+			statut_code(client, "404", "404 Not Found");
+		else
+			statut_code(client,  "403", "403 Forbidden");
 	}
 }
