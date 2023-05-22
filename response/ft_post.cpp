@@ -9,7 +9,10 @@ void ft_post(clients_info &client)
 		if (client.end_header_req == 1)
 		{
 			timee = time(NULL);
-			file = delSp(client.itLoc->upload_path + "/" + ft_to_string(timee) + get_extension(client.map_request["Content-Type"].c_str()));
+			if(!client.itLoc->cgi_path.empty())
+				file = delSp("/tmp/" + ft_to_string(timee) + get_extension(client.map_request["Content-Type"].c_str()));
+			else
+				file = delSp(client.itLoc->upload_path + "/" + ft_to_string(timee) + get_extension(client.map_request["Content-Type"].c_str()));
 			client.post_file = file;
 			client.fs.open(file, std::fstream::out);
 			if (!client.fs.is_open())

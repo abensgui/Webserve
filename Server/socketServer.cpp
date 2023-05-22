@@ -95,14 +95,12 @@ int SocketServer::remove_client(int socket_client)
     {
         if (socket_client == clients[it_client].socket_client_id)
         {
-            std::cout << "Client Num : " << clients[it_client].socket_client_id << " is Diconnected\n";
             close(clients[it_client].socket_client_id);
             clients.erase(clients.begin() + (it_client));
             return it_client;
         }
         it_client++;
     }
-    std::cout << it_client << "Not found\n";
     return 0;
 }
 
@@ -150,13 +148,12 @@ void SocketServer::connection(std::deque<server> &srv)
             {
                 it_client = get_client();
                 clients[it_client].socket_client_id = accept(srv[it_srv].socket_id, (struct sockaddr *)&(clients[it_client].address), &clients[it_client].addr_len);
-                fcntl(clients[it_client].socket_client_id, F_SETFL, O_NONBLOCK);
                 if (clients[it_client].socket_client_id < 0)
                 {
                     std::cerr << "Error in Connection\n";
                     return;
                 }
-                std::cout << "Client Num : " << clients[it_client].socket_client_id << " is Connected with Server : [" << srv[it_srv].host << ":" << srv[it_srv].port << "]\n";
+                fcntl(clients[it_client].socket_client_id, F_SETFL, O_NONBLOCK);
                 break;
             }
             it_srv++;

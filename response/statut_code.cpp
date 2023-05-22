@@ -27,14 +27,27 @@ void get_len(clients_info &client)
 	size_hed += ss.length();
 	if (ss.find("Content-type:") == std::string::npos && ss.find("Content-Type:") == std::string::npos)
 		ss += "Content-Type: text/html\r\n";
-
-	client.header = "HTTP/1.1 200 OK\r\n"
-					"Content-Length: " +
-					ft_to_string(client.size - size_hed) +
-					"\r\n" + ss;
-	if (!status.empty())
+	if (client.method == "POST")
 	{
-		client.header.replace(8, 7, status);
+		client.header = "HTTP/1.1 201 created\r\n"
+						"Content-Length: " +
+						ft_to_string(client.size - size_hed) +
+						"\r\n" + ss;
+		if (!status.empty())
+		{
+			client.header.replace(8, 12, status);
+		}
+	}
+	else
+	{
+		client.header = "HTTP/1.1 200 OK\r\n"
+						"Content-Length: " +
+						ft_to_string(client.size - size_hed) +
+						"\r\n" + ss;
+		if (!status.empty())
+		{
+			client.header.replace(8, 7, status);
+		}
 	}
 }
 
@@ -146,8 +159,7 @@ void ft_send(clients_info &client)
 			}
 			bzero(client.response, MAX_SIZE);
 		}
-
 	}
-	if (client.file.eof()|| client.flagRed == true)
+	if (client.file.eof() || client.flagRed == true)
 		client.clear_client = true;
 }

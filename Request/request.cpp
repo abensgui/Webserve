@@ -112,7 +112,7 @@ void SocketServer::parse_request(int it_client)
 			if (clients[it_client].body.size() == clients[it_client].content_len || (clients[it_client].is_chunk && pos_chunk != -1))
 				clients[it_client].post_finished = 1;
 		}
-		if (clients[it_client].body.size() >= clients[it_client].content_len || len_recived < MAX_SIZE)
+		if (clients[it_client].body.size() >= clients[it_client].content_len || (len_recived < MAX_SIZE && clients[it_client].method == "DELETE"))
 			clients[it_client].flag_res = 1;
 	}
 

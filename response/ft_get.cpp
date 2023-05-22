@@ -70,7 +70,6 @@ void ft_get(clients_info &client)
 		std::ifstream file1(file);
 		if (!client.itLoc->cgi_path.empty() && check_ext(file))
 		{
-			std::cout << file << "---- cgi ---- \n";
 			exec_cgi(client, file);
 		}
 		else if (file1.good())

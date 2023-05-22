@@ -9,12 +9,10 @@ void ft_delete(clients_info &client)
 	else
 		file.replace(0, client.itLoc->path_location.length() - 1, client.itLoc->root);
 	file = delSp(file);
-	// std::cout<< "----------   " << file << std::endl;
 	if (is_fileOrDir(client.path))
 		statut_code(client, "403", "403 Forbidden");
 	else
 	{
-		// std::cout<< file << "   del ----- \n" ;
 		std::ifstream file1(file);
 		if (file1.good())
 		{

@@ -2,7 +2,7 @@ NAME = webserv
 
 CC = c++ -std=c++98
 
-FLAGS = -Wall -Wextra -Werror 
+FLAGS = -Wall -Wextra -Werror -fsanitize=address -g3
 
 SRC =	Request/request.cpp\
 		configuration_file/configuration.cpp\
